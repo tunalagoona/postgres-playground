@@ -1,4 +1,4 @@
-# pglocks-playground
+# postgres-playground
 Testing PostgreSQL locks
 
 - [isolation levels](isolation_levels.md)
