@@ -2,15 +2,17 @@
 
 Let's create a table and populate it with values:
 
->CREATE TABLE locks (  
-> id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,  
-> name VARCHAR,  
-> age INTEGER  
->);
->
->INSERT INTO locks (name, age) VALUES ('Ann', 7);   
->INSERT INTO locks (name, age) VALUES ('Ben', 12);
->INSERT INTO locks (name, age) VALUES ('Sam', 5);
+```
+psql> CREATE TABLE children (  
+  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,  
+  name VARCHAR,  
+  age INTEGER  
+);
+
+psql> INSERT INTO children (name, age) VALUES ('Ann', 7);   
+psql> INSERT INTO children (name, age) VALUES ('Ben', 12);
+psql> INSERT INTO children (name, age) VALUES ('Sam', 5);
+```
 
 Our table should now look like this:
 
@@ -31,29 +33,29 @@ Let's try to update the rows from 2 clients concurrently:
   <tbody>
   <tr>
     <td>
-      <pre>START TRANSACTION;</pre>
+      <pre>psql> START TRANSACTION;</pre>
     </td>
     <td>
-      <pre>START TRANSACTION;</pre>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <pre>UPDATE locks SET age=10 WHERE name='Ann';</pre>
-    </td>
-    <td>
-      <pre>UPDATE locks SET age=13 WHERE name='Ben';</pre>
+      <pre>psql> START TRANSACTION;</pre>
     </td>
   </tr>
   <tr>
     <td>
-      <pre>UPDATE locks SET age=9 WHERE name='Ben';</pre>
-      The query stucks in waiting mode.
-      An exclusive row-level lock had been acquired when the row was updated by Client2
+      <pre>psql> UPDATE children SET age=10 WHERE name='Ann';</pre>
+      An exclusive row-level lock had been acquired when the row was updated.
     </td>
     <td>
-      <pre>UPDATE locks SET age=5 WHERE name='Ann';</pre>
-      An exclusive row-level lock had been acquired <br /> when the row was updated by Client1
+      <pre>psql> UPDATE children SET age=13 WHERE name='Ben';</pre>
+      An exclusive row-level lock had been acquired when the row was updated.
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <pre>psql> UPDATE children SET age=9 WHERE name='Ben';</pre>
+      The query stucks in a waiting mode. <br />Client2's transaction holds the lock that Client1's transaction wants.
+    </td>
+    <td>
+      <pre>psql> UPDATE children SET age=5 WHERE name='Ann';</pre>
       error:
       <pre>
 ERROR:  deadlock detected
@@ -72,9 +74,9 @@ Process 37281 waits for ShareLock on transaction 17501; <br />blocked by process
   </tr>
   <tr>
     <td>
-      <pre>COMMIT;</pre>
+      <pre>psql> COMMIT;</pre>
       <pre>
-  psql> SELECT * FROM locks;
+  psql> SELECT * FROM children;
   <p>
    id | name | age
   ----+------+-----
@@ -90,10 +92,10 @@ Process 37281 waits for ShareLock on transaction 17501; <br />blocked by process
   <tr>
     <td></td>
     <td>
-      <pre>COMMIT;</pre>
+      <pre>psql> COMMIT;</pre>
       <pre>ROLLBACK</pre>
       <pre>
-  psql> SELECT * FROM locks;
+  psql> SELECT * FROM children;
   <p>
    id | name | age
   ----+------+-----
