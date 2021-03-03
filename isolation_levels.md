@@ -65,7 +65,7 @@ psql> SELECT * FROM children;
   3 | Sam  |   5
 </p>
     </pre>
-    <i>The SELECT query never sees uncommitted data.</i>
+    <i>The SELECT query doesn't see uncommitted data.</i>
     </td>
     <td></td>
   </tr>
@@ -91,7 +91,7 @@ psql> SELECT * FROM children;
   3 | Sam  |   5
 </p>
     </pre>
-    <i>The query sees the data committed before the query began.</i>
+    <i>After the data is committed, it becomes visible to the transaction.</i>
     </td>
     <td></td>
   </tr>
@@ -161,7 +161,8 @@ psql> SELECT * FROM children;
   3 | Sam  |   5
 </p>
     </pre>
-      The Repeatable Read isolation level only sees data committed before the transaction began.
+      <i>The transaction only sees data committed</ br>
+      before it began. </i>
     </td>
     <td></td>
   </tr>
