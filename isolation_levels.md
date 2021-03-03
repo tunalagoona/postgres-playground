@@ -2,25 +2,24 @@
 
 Let's create a table and populate it with values:
 
->CREATE TABLE locks (  
-> id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,  
-> name VARCHAR,  
-> age INTEGER  
->);
->
->INSERT INTO locks (name, age) VALUES ('Ann', 6);   
->INSERT INTO locks (name, age) VALUES ('Ben', 8);
->
+```
+psql> CREATE TABLE children (  
+  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,  
+  name VARCHAR,  
+  age INTEGER  
+);
 
-Our table should now look like this:
-
+psql> INSERT INTO children (name, age) VALUES ('Ann', 6);   
+psql> INSERT INTO children (name, age) VALUES ('Ben', 8);
+psql> INSERT INTO children (name, age) VALUES ('Sam', 5);
+```
   
 | id      | name | age |
 | ----------- | ----------- | ----------- |
 |1|Ann|6|
-|2|Ben|8|   
-   
-Let's initiate 2 transactions and see first how **Read Committed** Isolation level works:
+|2|Ben|8|  
+|3|Sam|5| 
+
 
 ### Read Committed
 
@@ -32,60 +31,72 @@ Let's initiate 2 transactions and see first how **Read Committed** Isolation lev
   <tbody>
   <tr>
     <td>
-      <pre>START TRANSACTION ISOLATION LEVEL READ COMMITTED;</pre>
+      <pre>
+psql> START TRANSACTION ISOLATION LEVEL READ COMMITTED;
+START TRANSACTION
+      </pre>
     </td>
     <td>
-      <pre>START TRANSACTION;</pre>
+      <pre>
+psql> START TRANSACTION;
+START TRANSACTION
+      </pre>
     </td>
   </tr>
   <tr>
     <td></td>
     <td>
-      <pre>UPDATE locks SET age=7 WHERE name='Ann';</pre>
+      <pre>
+psql> UPDATE children SET age=7 WHERE name='Ann';
+UPDATE 1
+      </pre>
     </td>
   </tr>
   <tr>
     <td>
       <pre>
-  psql> SELECT * FROM locks;;
+psql> SELECT * FROM children;
 
-  <p>
-   id | name | age
-  ----+------+-----
-    1 | Ann  |   6
-    2 | Ben  |   8
-  </p>
+<p>
+ id | name | age
+----+------+-----
+  1 | Ann  |   6
+  2 | Ben  |   8
+  3 | Sam  |   5
+</p>
     </pre>
-    The SELECT query never sees uncommitted data.
+    <i>The SELECT query never sees uncommitted data.</i>
     </td>
     <td></td>
   </tr>
   <tr>
     <td></td>
     <td>
-      <pre>COMMIT;</pre>
+      <pre>
+psql> COMMIT;
+COMMIT
+      </pre>
     </td>
   </tr>
   <tr>
     <td>
       <pre>
-  psql> SELECT * FROM locks;;
+psql> SELECT * FROM children;
 
-  <p>
-   id | name | age
-  ----+------+-----
-    1 | Ann  |   7
-    2 | Ben  |   8
-  </p>
+<p>
+ id | name | age
+----+------+-----
+  1 | Ann  |   7
+  2 | Ben  |   8
+  3 | Sam  |   5
+</p>
     </pre>
-    The query sees the data committed before the query began.
+    <i>The query sees the data committed before the query began.</i>
     </td>
     <td></td>
   </tr>
   </tbody>
 </table>
-
-Now let's see how **Repeatable Read** Isolation works:
 
 ### Repeatable read
 
@@ -97,44 +108,58 @@ Now let's see how **Repeatable Read** Isolation works:
   <tbody>
   <tr>
     <td>
-      <pre>START TRANSACTION ISOLATION LEVEL REPEATABLE READ;</pre>
+      <pre>
+psql> START TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+START TRANSACTION
+      </pre>
     </td>
     <td>
-      <pre>START TRANSACTION;</pre>
+      <pre>
+psql> START TRANSACTION;
+START TRANSACTION
+      </pre>
     </td>
   </tr>
   <tr>
     <td>
         <pre>
-  psql> SELECT * FROM locks;
+psql> SELECT * FROM children;
 
-  <p>
-   id | name | age
-  ----+------+-----
-    1 | Ann  |   7
-    2 | Ben  |   8
-  </p>
+<p>
+ id | name | age
+----+------+-----
+  1 | Ann  |   7
+  2 | Ben  |   8
+  3 | Sam  |   5
+</p>
     </pre>
     </td>
     <td></td>
   </tr>
     <td></td>
     <td>
-      <pre>UPDATE locks SET age=12 WHERE name='Ben';</pre>
-      <pre>COMMIT;</pre>
+      <pre>
+psql> UPDATE children SET age=12 WHERE name='Ben';
+UPDATE 1
+      </pre>
+      <pre>
+psql> COMMIT;
+COMMIT
+      </pre>
     </td>
   </tr>
   <tr>
     <td>
       <pre>
-  psql> SELECT * FROM locks;
+psql> SELECT * FROM children;
 
-  <p>
-   id | name | age
-  ----+------+-----
-    1 | Ann  |   7
-    2 | Ben  |   8
-  </p>
+<p>
+ id | name | age
+----+------+-----
+  1 | Ann  |   7
+  2 | Ben  |   8
+  3 | Sam  |   5
+</p>
     </pre>
       The Repeatable Read isolation level only sees data committed before the transaction began.
     </td>
