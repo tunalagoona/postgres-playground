@@ -10,7 +10,7 @@ Let's create a table and populate it with values:
 >
 >INSERT INTO locks (name, age) VALUES ('Ann', 7);   
 >INSERT INTO locks (name, age) VALUES ('Ben', 12);
->
+>INSERT INTO locks (name, age) VALUES ('Sam', 5);
 
 Our table should now look like this:
 
@@ -18,7 +18,8 @@ Our table should now look like this:
 | id      | name | age |
 | ----------- | ----------- | ----------- |
 |1|Ann|7|
-|2|Ben|12|   
+|2|Ben|12|  
+|3|Sam|5| 
    
 Let's try to update the rows from 2 clients concurrently:
 
@@ -52,17 +53,15 @@ Let's try to update the rows from 2 clients concurrently:
     </td>
     <td>
       <pre>UPDATE locks SET age=5 WHERE name='Ann';</pre>
-      An exclusive row-level lock had been acquired when the row was updated by Client1
+      An exclusive row-level lock had been acquired <br /> when the row was updated by Client1
       error:
       <pre>
-        ERROR:  deadlock detected
-        DETAIL:  Process 37184 waits for ShareLock on transaction 17500; blocked by process 37281.
-        Process 37281 waits for ShareLock on transaction 17501; blocked by process 37184.
-        HINT:  See server log for query details.
-        CONTEXT:  while updating tuple (0,3) in relation "locks"
+ERROR:  deadlock detected
+DETAIL:  Process 37184 waits for ShareLock <br />on transaction 17500; blocked by process 37281.
+Process 37281 waits for ShareLock on transaction 17501; <br />blocked by process 37184.
       </pre>
-      two (or more) transactions each hold locks that the other wants.
-      PostgreSQL automatically detects deadlock situations and resolves them by aborting one of the transactions involved, allowing the other(s) to complete. 
+      Two transactions each hold locks that the other wants.<br /> 
+      PostgreSQL automatically detects deadlock situations <br />and resolves them by aborting one of the transactions <br />involved, allowing the other(s) to complete. 
     </td>
   </tr>
   <tr>
@@ -81,6 +80,7 @@ Let's try to update the rows from 2 clients concurrently:
   ----+------+-----
     1 | Ann  |   10
     2 | Ben  |    9
+    3 | Sam  |    5
   </p>
     </pre>
     The lock is held until the transaction commits or rolls back. 
@@ -99,6 +99,7 @@ Let's try to update the rows from 2 clients concurrently:
   ----+------+-----
     1 | Ann  |   10
     2 | Ben  |    9
+    3 | Sam  |    5
   </p>
     </pre>
     </td>
