@@ -1,4 +1,4 @@
-## Transaction Isolation Levels
+## Transaction Isolation
 
 Database structure:
 
@@ -25,20 +25,22 @@ psql> INSERT INTO kids (name, age) VALUES ('Sam', 5);
 
 <table>
   <thead>
-    <th>Client1</th>
-    <th>Client2</th>
+    <th>client#1</th>
+    <th>client#2</th>
   </thead>
   <tbody>
   <tr>
     <td>
       <pre>
-psql> START TRANSACTION ISOLATION LEVEL READ COMMITTED;
+psql> START TRANSACTION ISOLATION LEVEL 
+      READ COMMITTED;
 START TRANSACTION
       </pre>
     </td>
     <td>
       <pre>
-psql> START TRANSACTION ISOLATION LEVEL READ COMMITTED;
+psql> START TRANSACTION ISOLATION LEVEL 
+      READ COMMITTED;
 START TRANSACTION
       </pre>
     </td>
@@ -65,7 +67,7 @@ psql> SELECT * FROM kids;
   3 | Sam  |   5
 </p>
     </pre>
-    <i>The SELECT query doesn't see uncommitted data.</i>
+    <i>The SELECT query can not see the uncommitted changes made by the client#2.</i>
     </td>
     <td></td>
   </tr>
@@ -91,19 +93,19 @@ psql> SELECT * FROM kids;
   3 | Sam  |   5
 </p>
     </pre>
-    <i>After the data is committed, it becomes visible to the transaction.</i>
+    <i>Once the changes are committed by the client#2, the become visible to the client#1 transaction.</i>
     </td>
     <td></td>
   </tr>
   </tbody>
 </table>
 
-### Repeatable read
+### Repeatable Read
 
 <table>
   <thead>
-    <th>Client1</th>
-    <th>Client2</th>
+    <th>client#1</th>
+    <th>client#2</th>
   </thead>
   <tbody>
   <tr>
