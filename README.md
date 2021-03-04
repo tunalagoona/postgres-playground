@@ -1,5 +1,5 @@
 # postgres-playground
-Testing concurrent transactions in PostgreSQL
+Playing with Postgres concurrency: locks, isolation levels, deadlock prevention
 
 - [isolation levels](isolation-levels.md)
 - [single lock](single-lock.md)
