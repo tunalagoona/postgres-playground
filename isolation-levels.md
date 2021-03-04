@@ -1,17 +1,17 @@
-## PostgreSQL Isolation Levels
+## Transaction Isolation Levels
 
-Let's create a table and populate it with values:
+Database structure:
 
 ```
-psql> CREATE TABLE children (  
+psql> CREATE TABLE kids (  
   id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,  
   name VARCHAR,  
   age INTEGER  
 );
 
-psql> INSERT INTO children (name, age) VALUES ('Ann', 6);   
-psql> INSERT INTO children (name, age) VALUES ('Ben', 8);
-psql> INSERT INTO children (name, age) VALUES ('Sam', 5);
+psql> INSERT INTO kids (name, age) VALUES ('Ann', 6);   
+psql> INSERT INTO kids (name, age) VALUES ('Ben', 8);
+psql> INSERT INTO kids (name, age) VALUES ('Sam', 5);
 ```
   
 | id      | name | age |
@@ -38,7 +38,7 @@ START TRANSACTION
     </td>
     <td>
       <pre>
-psql> START TRANSACTION;
+psql> START TRANSACTION ISOLATION LEVEL READ COMMITTED;
 START TRANSACTION
       </pre>
     </td>
@@ -47,7 +47,7 @@ START TRANSACTION
     <td></td>
     <td>
       <pre>
-psql> UPDATE children SET age=7 WHERE name='Ann';
+psql> UPDATE kids SET age=7 WHERE name='Ann';
 UPDATE 1
       </pre>
     </td>
@@ -55,7 +55,7 @@ UPDATE 1
   <tr>
     <td>
       <pre>
-psql> SELECT * FROM children;
+psql> SELECT * FROM kids;
 
 <p>
  id | name | age
@@ -81,7 +81,7 @@ COMMIT
   <tr>
     <td>
       <pre>
-psql> SELECT * FROM children;
+psql> SELECT * FROM kids;
 
 <p>
  id | name | age
@@ -123,7 +123,7 @@ START TRANSACTION
   <tr>
     <td>
         <pre>
-psql> SELECT * FROM children;
+psql> SELECT * FROM kids;
 
 <p>
  id | name | age
@@ -139,7 +139,7 @@ psql> SELECT * FROM children;
     <td></td>
     <td>
       <pre>
-psql> UPDATE children SET age=12 WHERE name='Ben';
+psql> UPDATE kids SET age=12 WHERE name='Ben';
 UPDATE 1
       </pre>
       <pre>
@@ -151,7 +151,7 @@ COMMIT
   <tr>
     <td>
       <pre>
-psql> SELECT * FROM children;
+psql> SELECT * FROM kids;
 
 <p>
  id | name | age
