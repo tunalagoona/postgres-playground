@@ -1,5 +1,5 @@
 
-## PostgreSQL Locks
+## PostgreSQL Sibgle Locks
 
 Let's create a table and populate it with values:
 
