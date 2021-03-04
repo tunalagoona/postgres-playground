@@ -129,13 +129,14 @@ psql> SELECT * FROM weather;
   </tbody>
 </table>
 
+<br>
 
 | id      | the_date | temperature |
 | ----------- | ----------- | ----------- |
 |1|2020-04-15|0|
 |2|2020-04-16|5|  
 |3|2020-04-17|10| 
-
+<br>
 
 ### explicit shared row-level lock   
 <table>
@@ -225,7 +226,118 @@ UPDATE 1
         transaction holded a shared lock.</i>
     </td>
   </tr> 
-    
-  
+  </tbody>
+</table>
+
+<br>
+
+| id      | the_date | temperature |
+| ----------- | ----------- | ----------- |
+|1|2020-04-15|0|
+|2|2020-04-16|0|  
+|3|2020-04-17|10| 
+<br>
+
+### explicit exclusive row-level lock 
+
+<table>
+  <thead>
+    <th>Client1</th>
+    <th>Client2</th>
+  </thead>
+  <tbody>
+  <tr>
+    <td>
+      <pre>
+psql> START TRANSACTION;
+START TRANSACTION
+      </pre>
+    </td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>
+      <pre>
+psql> START TRANSACTION;
+START TRANSACTION
+      </pre>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <pre>
+psql> SELECT * FROM weather   
+      WHERE the_date='2020-04-17' FOR UPDATE;
+<br>
+id |  the_date  | temperature
+----+------------+-------------
+  3 | 2020-04-17 |          10
+      </pre>
+      <i>The first transaction acquires an exclusive row-level lock   
+        on a row without actually modifying the row.</i>
+    </td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>
+      <pre>
+psql> SELECT * FROM weather   
+      WHERE the_date='2020-04-17' FOR UPDATE;
+...
+      </pre>
+      <i>The second transaction can't acquire 
+        an exclusive row-level lock on the row.</i>
+    </td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>
+      <i>Let's rollback the second transation so we could try to update the row.</i>
+      <pre>
+psql> ROLLBACK;
+ROLLBACK
+<br>
+psql> START TRANSACTION;
+START TRANSACTION
+<br>
+psql> UPDATE weather SET temperature=0   
+      WHERE the_date='2020-04-17';
+...
+      </pre>
+      <i>The query falls in a waiting mode until the first transaction releases the lock.</i>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <pre>
+psql> COMMIT;
+COMMIT
+      </pre>
+      <i>The first transaction releases the lock.</i>
+    </td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>
+      <pre>
+UPDATE 1
+
+psql> COMMIT;
+COMMIT
+
+psql> SELECT * FROM weather;
+<br>
+ id |  the_date  | temperature
+----+------------+-------------
+  1 | 2020-04-15 |           0
+  2 | 2020-04-16 |           0
+  3 | 2020-04-17 |           0
+      </pre>
+      <i>The second transaction acquires the lock and updates the row.</i>
+    </td>
+  </tr>
   </tbody>
 </table>
