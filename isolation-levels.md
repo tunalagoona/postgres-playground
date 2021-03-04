@@ -104,11 +104,13 @@ psql> SELECT * FROM kids;
 
 <table>
   <thead>
+    <th>#</th>
     <th>client#1</th>
     <th>client#2</th>
   </thead>
   <tbody>
   <tr>
+    <td>1</td>
     <td>
       <pre>
 psql> START TRANSACTION ISOLATION LEVEL
@@ -125,6 +127,7 @@ START TRANSACTION
     </td>
   </tr>
   <tr>
+    <td>2</td>
     <td>
         <pre>
 psql> SELECT * FROM kids;
@@ -140,19 +143,19 @@ psql> SELECT * FROM kids;
     </td>
     <td></td>
   </tr>
+    <td>3</td>
     <td></td>
     <td>
       <pre>
 psql> UPDATE kids SET age=12 WHERE name='Ben';
 UPDATE 1
-      </pre>
-      <pre>
 psql> COMMIT;
 COMMIT
       </pre>
     </td>
   </tr>
   <tr>
+    <td>4</td>
     <td>
       <pre>
 psql> SELECT * FROM kids;
@@ -165,8 +168,7 @@ psql> SELECT * FROM kids;
   3 | Sam  |   5
 </p>
     </pre>
-      <i>The transaction only sees data committed</ br>
-      before it began. </i>
+      <i>While the <b>client#2</b> has already committed the changes, <b>client#1</b> uses the snapshot created at the step 2 which does not include those changes.</i>
     </td>
     <td></td>
   </tr>
