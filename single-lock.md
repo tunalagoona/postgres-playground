@@ -24,7 +24,7 @@ psql> INSERT INTO weather (the_date, temperature) VALUES ('2020-04-17', 10);
 |3|2020-04-17|10| 
 
    
-   
+### implicit exclusive row-level lock   
 <table>
   <thead>
     <th>Client1</th>
@@ -69,9 +69,9 @@ UPDATE 1
 psql> SELECT * FROM weather    
       WHERE the_date='2020-04-15';   
 <br>
-id |  the_date  | temperature
+ id |  the_date  | temperature
 ----+------------+-------------
-1 | 2020-04-15 |           8
+  1 | 2020-04-15 |           8
     </pre>
       <i>Row-level lock doesn't affect data querying.</i>
     </td>
@@ -117,14 +117,115 @@ UPDATE 1
       <pre>
 psql> SELECT * FROM weather;   
 <br>
-id |  the_date  | temperature
+ id |  the_date  | temperature
 ----+------------+-------------
-2 | 2020-04-16 |           5
-3 | 2020-04-17 |          10
-1 | 2020-04-15 |           0
+  2 | 2020-04-16 |           5
+  3 | 2020-04-17 |          10
+  1 | 2020-04-15 |           0
       </pre>
     </td>
   </tr>
+  
+  </tbody>
+</table>
+
+
+| id      | the_date | temperature |
+| ----------- | ----------- | ----------- |
+|1|2020-04-15|0|
+|2|2020-04-16|5|  
+|3|2020-04-17|10| 
+
+
+### explicit shared row-level lock   
+<table>
+  <thead>
+    <th>Client1</th>
+    <th>Client2</th>
+  </thead>
+  <tbody>
+  <tr>
+    <td>
+      <pre>
+psql> START TRANSACTION;
+START TRANSACTION
+      </pre>
+    </td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>
+      <pre>
+psql> START TRANSACTION;
+START TRANSACTION
+      </pre>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <pre>
+psql> SELECT * FROM weather    
+      WHERE the_date='2020-04-16' FOR SHARE;
+<br> 
+ id |  the_date  | temperature
+----+------------+-------------
+  2 | 2020-04-16 |           5
+      </pre>
+      <i>The transaction acquires a shared row-level lock on a row.</i>
+    </td>
+    <td></td>
+  </tr> 
+  <tr>
+    <td></td>
+    <td>
+      <pre>
+psql> SELECT * FROM weather    
+      WHERE the_date='2020-04-16' FOR SHARE;
+<br>
+ id |  the_date  | temperature
+----+------------+-------------
+  2 | 2020-04-16 |           5
+      </pre>
+      <i>A shared lock does not prevent the second transaction    
+        from acquiring the same shared lock.</i>
+    </td>
+  </tr> 
+  <tr>
+    <td></td>
+    <td>
+      <pre>
+psql> UPDATE weather SET temperature=0   
+      WHERE the_date='2020-04-16';  
+...
+      </pre>
+      <i>The second transaction is not allowed to update a row   
+        on which the first transaction holds a shared lock.</i>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <pre>
+psql> COMMIT;
+COMMIT
+      </pre>
+      <i>After the first transaction is committed,   
+        the shared lock on the row is released.</i>
+    </td>
+    <td></td>
+  </tr> 
+  <tr>
+    <td></td>
+    <td>
+      <pre>
+UPDATE 1
+      </pre>
+      <i>The second transaction is now allowed to acquire    
+        exclusive lock and update a row on which the first   
+        transaction holded a shared lock.</i>
+    </td>
+  </tr> 
+    
   
   </tbody>
 </table>
