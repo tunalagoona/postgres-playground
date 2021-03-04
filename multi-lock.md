@@ -190,13 +190,15 @@ START TRANSACTION
     <tr>
       <td>
         <pre>
-psql> SELECT * FROM children WHERE name='Ann' FOR UPDATE;
+psql> SELECT * FROM children    
+      WHERE name='Ann' FOR UPDATE;
 <br>
  id | name | age
 ----+------+-----
   1 | Ann  |  10
         </pre>
-        <i>The first transaction acquires exclusive row-level lock on the 'Ann' row.</i>
+        <i>The first transaction acquires exclusive <br />
+          row-level lock on the 'Ann' row.</i>
       </td>
       <td></td>
     </tr>
@@ -204,22 +206,25 @@ psql> SELECT * FROM children WHERE name='Ann' FOR UPDATE;
       <td></td>
       <td>
         <pre>
-psql> SELECT * FROM children WHERE name='Ben' FOR UPDATE;
+psql> SELECT * FROM children    
+      WHERE name='Ben' FOR UPDATE;
 <br>
  id | name | age
 ----+------+-----
   2 | Ben  |   9
         </pre>
-        <i>The second transaction acquires exclusive row-level lock on the 'Ben' row.</i>
+        <i>The second transaction acquires exclusive<br /> 
+          row-level lock on the 'Ben' row.</i>
       </td>
     </tr>
     <tr>
       <td>
         <pre>
-psql> UPDATE children SET age=13 WHERE name='Ben';
+psql> UPDATE children SET age=13    
+      WHERE name='Ben';
 ...
         </pre>
-        <i>The first transaction attempts to update   
+        <i>The first transaction attempts to update<br />
           the 'Ben' row and falls in a waiting mode.</i>
       </td>
       <td></td>
@@ -228,15 +233,19 @@ psql> UPDATE children SET age=13 WHERE name='Ben';
       <td></td>
       <td>
         <pre>
-psql> UPDATE children SET age=14 WHERE name='Ann';
+psql> UPDATE children    
+      SET age=14 WHERE name='Ann';
 <br>
 ERROR:  deadlock detected
-DETAIL:  Process 42439 waits for ShareLock on transaction 17685; blocked by process 84586.
-Process 84586 waits for ShareLock on transaction 17686; blocked by process 42439.
+DETAIL:  Process 42439 waits for ShareLock    
+on transaction 17685; blocked by process 84586.    
+Process 84586 waits for ShareLock    
+on transaction 17686; blocked by process 42439.
         </pre>
-        <i>The second transaction attempts to update   
-          the 'Ann' row. Postgres detects deadlock and aborts the query,   
-          allowing the first transaction to succeed.</i>
+        <i>The second transaction attempts<br />
+          to update the 'Ann' row. Postgres detects deadlock<br />    
+          and aborts the query, allowing the first transaction<br />     
+          to succeed.</i>
       </td>
     </tr>
      <tr>
@@ -255,7 +264,8 @@ psql> SELECT * FROM children;
   1 | Ann  |  10
   2 | Ben  |  13
         </pre>
-        <i>The first transaction updates the 'Ben' row and releases the lock upon commit.</i>
+        <i>The first transaction updates the 'Ben' row<br />  
+          and releases the lock upon commit.</i>
       </td>
       <td></td>
     </tr> 
