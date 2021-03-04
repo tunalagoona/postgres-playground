@@ -25,7 +25,8 @@ psql> INSERT INTO children (name, age) VALUES ('Sam', 5);
 Let's try to update the same rows from 2 clients concurrently.
 
 ### Deadlock on implicit exclusive row-level locks 
-
+   
+   
 <table>
   <thead>
     <th>Client1</th>
@@ -149,16 +150,19 @@ psql> SELECT * FROM children;
   </tbody>
 </table>
 <br>
+
 | id      | name | age |
 | ----------- | ----------- | ----------- |
 |1|Ann|10|
 |2|Ben|9|  
 |3|Sam|5| 
+
 <br>
 
 
-### Deadlock on explicit exclusive row-level locks  
-
+### Deadlock on explicit exclusive row-level locks    
+   
+   
 <table>
   <thead>
     <th>Client1</th>
