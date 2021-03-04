@@ -2,6 +2,6 @@
 Testing PostgreSQL locks
 
 - [isolation levels](isolation_levels.md)
-- [single-lock](single-lock.md)
-- [multi-lock](multi-lock.md)
-- [deadlock](deadlock.md)
+- [single lock](single-lock.md)
+- [multilock](multi-lock.md)
+- [deadlock prevention](deadlock-prevention.md)
