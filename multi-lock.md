@@ -24,7 +24,7 @@ psql> INSERT INTO children (name, age) VALUES ('Sam', 5);
    
 Let's try to update the same rows from 2 clients concurrently.
 
-## Deadlock on implicit exclusive row-level locks 
+### Deadlock on implicit exclusive row-level locks 
 
 <table>
   <thead>
@@ -148,3 +148,113 @@ psql> SELECT * FROM children;
   </tr>
   </tbody>
 </table>
+<br>
+| id      | name | age |
+| ----------- | ----------- | ----------- |
+|1|Ann|10|
+|2|Ben|9|  
+|3|Sam|5| 
+<br>
+
+
+### Deadlock on explicit exclusive row-level locks  
+
+<table>
+  <thead>
+    <th>Client1</th>
+    <th>Client2</th>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <pre>
+psql> START TRANSACTION;
+START TRANSACTION
+        </pre>
+      </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>
+        <pre>
+psql> START TRANSACTION;
+START TRANSACTION
+        </pre>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <pre>
+psql> SELECT * FROM children WHERE name='Ann' FOR UPDATE;
+<br>
+ id | name | age
+----+------+-----
+  1 | Ann  |  10
+        </pre>
+        <i>The first transaction acquires exclusive row-level lock on the 'Ann' row.</i>
+      </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>
+        <pre>
+psql> SELECT * FROM children WHERE name='Ben' FOR UPDATE;
+<br>
+ id | name | age
+----+------+-----
+  2 | Ben  |   9
+        </pre>
+        <i>The second transaction acquires exclusive row-level lock on the 'Ben' row.</i>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <pre>
+psql> UPDATE children SET age=13 WHERE name='Ben';
+...
+        </pre>
+        <i>The first transaction attempts to update   
+          the 'Ben' row and falls in a waiting mode.</i>
+      </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>
+        <pre>
+psql> UPDATE children SET age=14 WHERE name='Ann';
+<br>
+ERROR:  deadlock detected
+DETAIL:  Process 42439 waits for ShareLock on transaction 17685; blocked by process 84586.
+Process 84586 waits for ShareLock on transaction 17686; blocked by process 42439.
+        </pre>
+        <i>The second transaction attempts to update   
+          the 'Ann' row. Postgres detects deadlock and aborts the query,   
+          allowing the first transaction to succeed.</i>
+      </td>
+    </tr>
+     <tr>
+      <td>
+        <pre>
+UPDATE 1
+<br>
+psql> COMMIT;
+COMMIT
+<br>
+psql> SELECT * FROM children;
+<br>
+ id | name | age
+----+------+-----
+  3 | Sam  |   5
+  1 | Ann  |  10
+  2 | Ben  |  13
+        </pre>
+        <i>The first transaction updates the 'Ben' row and releases the lock upon commit.</i>
+      </td>
+      <td></td>
+    </tr> 
+  </tbody>
+</table>
+
