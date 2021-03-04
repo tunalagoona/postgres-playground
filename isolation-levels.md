@@ -25,11 +25,13 @@ psql> INSERT INTO kids (name, age) VALUES ('Sam', 5);
 
 <table>
   <thead>
+    <th>#</th>
     <th>client#1</th>
     <th>client#2</th>
   </thead>
   <tbody>
   <tr>
+    <td>1</td>
     <td>
       <pre>
 psql> START TRANSACTION ISOLATION LEVEL 
@@ -46,6 +48,7 @@ START TRANSACTION
     </td>
   </tr>
   <tr>
+    <td>2</td>
     <td></td>
     <td>
       <pre>
@@ -55,6 +58,7 @@ UPDATE 1
     </td>
   </tr>
   <tr>
+    <td>3</td>
     <td>
       <pre>
 psql> SELECT * FROM kids;
@@ -72,6 +76,7 @@ psql> SELECT * FROM kids;
     <td></td>
   </tr>
   <tr>
+    <td>4</td>
     <td></td>
     <td>
       <pre>
@@ -81,6 +86,7 @@ COMMIT
     </td>
   </tr>
   <tr>
+    <td>5</td>
     <td>
       <pre>
 psql> SELECT * FROM kids;
