@@ -67,7 +67,7 @@ psql> SELECT * FROM kids;
   3 | Sam  |   5
 </p>
     </pre>
-    <i>The SELECT query can not see the uncommitted changes made by the client#2.</i>
+    <i>The SELECT query can not see the uncommitted changes made by the <b>client#2</b>.</i>
     </td>
     <td></td>
   </tr>
@@ -93,7 +93,7 @@ psql> SELECT * FROM kids;
   3 | Sam  |   5
 </p>
     </pre>
-    <i>Once the changes are committed by the client#2, the become visible to the client#1 transaction.</i>
+    <i>Once the changes are committed by the <b>client#2</b>, they become visible to the <b>client#1</b> transaction.</i>
     </td>
     <td></td>
   </tr>
@@ -111,13 +111,15 @@ psql> SELECT * FROM kids;
   <tr>
     <td>
       <pre>
-psql> START TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+psql> START TRANSACTION ISOLATION LEVEL
+      REPEATABLE READ;
 START TRANSACTION
       </pre>
     </td>
     <td>
       <pre>
-psql> START TRANSACTION;
+psql> START TRANSACTION ISOLATION LEVEL
+      READ COMMITTED;
 START TRANSACTION
       </pre>
     </td>
