@@ -324,7 +324,7 @@ COMMIT
     <td>
       <pre>
 UPDATE 1
-
+<br>
 psql> COMMIT;
 COMMIT
 
