@@ -1,5 +1,5 @@
 # postgres-playground
-Testing PostgreSQL locks
+Testing concurrent transactions in PostgreSQL
 
 - [isolation levels](isolation_levels.md)
 - [single lock](single-lock.md)
