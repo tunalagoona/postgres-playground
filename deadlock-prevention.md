@@ -259,3 +259,38 @@ COMMIT
 |3|Sean Bean|Gollum| 
 |4|Andy Serkis|Frodo Baggins| 
 
+
+
+### Lock hierarchy
+
+Description
+This approach prevents **circular waits** condition.
+
+<table>
+  <thead>
+    <th>Client1</th>
+    <th>Client2</th>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <pre>
+psql> START TRANSACTION;
+START TRANSACTION;
+        </pre>
+      </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>
+        <pre>
+psql> START TRANSACTION;
+START TRANSACTION;
+        </pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
