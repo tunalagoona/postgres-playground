@@ -1,5 +1,6 @@
 # postgres-playground
-Playing with Postgres concurrency: locks, isolation levels, deadlock prevention
+
+Playing with some of the Postgres Isolation Levels and various lock modes to control concurrent access to data.
 
 - [isolation levels](isolation-levels.md)
 - [single lock](single-lock.md)
