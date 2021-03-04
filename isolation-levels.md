@@ -2,7 +2,7 @@
 
 [Reference](https://www.postgresql.org/docs/current/transaction-iso.html)
 
-#### Database structure:
+### Database structure:
 
 ```
 psql> CREATE TABLE kids (  
@@ -23,9 +23,9 @@ psql> INSERT INTO kids (name, age) VALUES ('Sam', 5);
 |3|Sam|5| 
 
 
-#### Read Committed
+### Read Committed
 
-> "When a transaction uses this isolation level, a SELECT query (without a FOR UPDATE/SHARE clause) sees only data committed before the query began; it never sees either uncommitted data or changes committed during query execution by concurrent transactions. In effect, a SELECT query sees a snapshot of the database as of the instant the query begins to run. However, SELECT does see the effects of previous updates executed within its own transaction, even though they are not yet committed. Also note that two successive SELECT commands can see different data, even though they are within a single transaction, if other transactions commit changes after the first SELECT starts and before the second SELECT starts."
+> "When a transaction uses this isolation level, a SELECT query (without a FOR UPDATE/SHARE clause) sees only data committed before the query began; it never sees either uncommitted data or changes committed during query execution by concurrent transactions. (...) two successive SELECT commands can see different data, even though they are within a single transaction, if other transactions commit changes after the first SELECT starts and before the second SELECT starts."
 
 <table>
   <thead>
@@ -110,7 +110,9 @@ psql> SELECT * FROM kids;
   </tbody>
 </table>
 
-#### Repeatable Read
+### Repeatable Read
+
+> "The Repeatable Read isolation level only sees data committed before the transaction began; it never sees either uncommitted data or changes committed during transaction execution by concurrent transactions. (...) a query in a repeatable read transaction sees a snapshot as of the start of the first non-transaction-control statement in the transaction, not as of the start of the current statement within the transaction."
 
 <table>
   <thead>
