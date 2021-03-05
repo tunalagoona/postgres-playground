@@ -12,8 +12,8 @@ Playing with Postgres concurrency: locks, isolation levels, deadlock prevention.
   - [Explicit exclusive row-level lock (SELECT FOR UPDATE)](/row-level-locks.md#explicit-exclusive-row-level-lock-select-for-update)
     
 - [Deadlocks](/deadlocks.md#deadlocks)
-  - [Deadlock on implicit exclusive row-level locks](/deadlocks.md#deadlock-on-implicit-exclusive-row-level-locks)
-  - [Deadlock on explicit exclusive row-level locks](/deadlocks.md#deadlock-on-explicit-exclusive-row-level-locks)
+  - [Deadlock on implicit exclusive row-level locks (ordinary UPDATE)](/deadlocks.md#eadlock-on-implicit-exclusive-row-level-locks-ordinary-update)
+  - [Deadlock on explicit exclusive row-level locks (SELECT FOR UPDATE)](/deadlocks.md#deadlock-on-explicit-exclusive-row-level-locks-select-for-update)
 
 - [Deadlock prevention](/deadlock-prevention.md#deadlock-prevention)
   - [Multiple transactions](/deadlock-prevention.md#multiple-transactions)
