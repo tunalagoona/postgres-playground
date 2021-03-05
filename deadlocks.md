@@ -196,7 +196,7 @@ psql> SELECT * FROM kids
 ----+------+-----
   1 | Ann  |  10
         </pre>
-        <i>The <b>client#1</b> acquires an exclusive <br />
+        <i><b>Client#1</b> acquires an exclusive <br />
           row-level lock on the 'Ann' row.</i>
       </td>
       <td></td>
@@ -213,7 +213,7 @@ psql> SELECT * FROM kids
 ----+------+-----
   2 | Ben  |   9
         </pre>
-        <i>The <b>client#2</b> acquires an exclusive<br /> 
+        <i><b>Client#2</b> acquires an exclusive<br /> 
           row-level lock on the 'Ben' row.</i>
       </td>
     </tr>
@@ -225,7 +225,7 @@ psql> UPDATE kids SET age=13
       WHERE name='Ben';
 ...
         </pre>
-        <i>The <b>client#1</b> attempts to update<br />
+        <i><b>Client#1</b> attempts to update<br />
           the 'Ben' row and falls into the waiting mode.</i>
       </td>
       <td></td>
@@ -236,17 +236,17 @@ psql> UPDATE kids SET age=13
       <td>
         <pre>
 psql> UPDATE kids    
-      SET age=14 WHERE name='Ann';
-<br>
-ERROR:  deadlock detected<br />
-DETAIL:  Process 42439 waits for ShareLock  <br />  
-on transaction 17685; blocked by process 84586.  <br />  
-Process 84586 waits for ShareLock    <br />
+      SET age=14 WHERE name='Ann';<br>
+ERROR:  deadlock detected   
+DETAIL:  Process 42439 waits for ShareLock     
+on transaction 17685; blocked by process 84586.   
+Process 84586 waits for ShareLock   
 on transaction 17686; blocked by process 42439.
         </pre>
-        <i>The <b>client#2</b> attempts<br />
-          to update the 'Ann' row. Postgres detects the deadlock<br />    
-          and aborts the query, allowing the <b>client#1</b> to succeed.</i>
+        <i><b>Client#2</b> attempts to update<br />
+          the 'Ann' row. Postgres detects the deadlock<br />    
+          and aborts the query, allowing <b>Client#1</b><br />
+          to succeed.</i>
       </td>
     </tr>
     <tr>
