@@ -107,7 +107,7 @@ on transaction 17500; blocked by process 37281.<br/>
 Process 37281 waits for ShareLock on transaction 17501; <br/>
 blocked by process 37184.
         </pre>
-        <i>Circular wait situation: PostgreSQL automatically detects <br/> 
+        <i>Circular wait situation: Postgres automatically detects <br/> 
         deadlocks and resolves them by aborting one of transactions, <br/>
         allowing the other to complete. </i>
       </td>
