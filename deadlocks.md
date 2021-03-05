@@ -3,18 +3,18 @@
 
 [Reference](https://www.postgresql.org/docs/9.1/explicit-locking.html)
 
-### Database structure:
+### Database Structure
 
 ```
-psql> CREATE TABLE children (  
+psql> CREATE TABLE kids (  
   id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,  
   name VARCHAR,  
   age INTEGER  
 );
 
-psql> INSERT INTO children (name, age) VALUES ('Ann', 7);   
-psql> INSERT INTO children (name, age) VALUES ('Ben', 12);
-psql> INSERT INTO children (name, age) VALUES ('Sam', 5);
+psql> INSERT INTO kids (name, age) VALUES ('Ann', 7);   
+psql> INSERT INTO kids (name, age) VALUES ('Ben', 12);
+psql> INSERT INTO kids (name, age) VALUES ('Sam', 5);
 ```
 
   
@@ -59,7 +59,7 @@ START TRANSACTION
       <td>3</td>
       <td>
         <pre>
-psql> UPDATE children SET age=10 WHERE name='Ann';
+psql> UPDATE kids SET age=10 WHERE name='Ann';
 UPDATE 1
         </pre>
         <i>
@@ -74,7 +74,7 @@ UPDATE 1
       <td></td>
       <td>
         <pre>
-psql> UPDATE children SET age=13 WHERE name='Ben';
+psql> UPDATE kids SET age=13 WHERE name='Ben';
 UPDATE 1
         </pre>
         <i>
@@ -87,7 +87,7 @@ UPDATE 1
       <td>5</td>
       <td>
         <pre>
-psql> UPDATE children SET age=9 WHERE name='Ben';
+psql> UPDATE kids SET age=9 WHERE name='Ben';
 ...
         </pre>
         <i>The query stucks in a waiting mode. <br />
@@ -101,7 +101,7 @@ psql> UPDATE children SET age=9 WHERE name='Ben';
       <td></td>
       <td>
         <pre>
-psql> UPDATE children SET age=5 WHERE name='Ann';
+psql> UPDATE kids SET age=5 WHERE name='Ann';
 
 ERROR:  deadlock detected
 DETAIL:  Process 37184 waits for ShareLock <br />
@@ -128,7 +128,7 @@ blocked by process 37184.
       <td>
         <pre>psql> COMMIT;</pre>
         <pre>
-psql> SELECT * FROM children;
+psql> SELECT * FROM kids;
 <p>
  id | name | age
 ----+------+-----
@@ -149,7 +149,7 @@ psql> SELECT * FROM children;
 psql>COMMIT;
 ROLLBACK</pre>
         <pre>
-psql> SELECT * FROM children;
+psql> SELECT * FROM kids;
 <p>
  id | name | age
 ----+------+-----
@@ -208,7 +208,7 @@ START TRANSACTION
       <td>3</td>
       <td>
         <pre>
-psql> SELECT * FROM children    
+psql> SELECT * FROM kids    
       WHERE name='Ann' FOR UPDATE;
 <br>
  id | name | age
@@ -225,7 +225,7 @@ psql> SELECT * FROM children
       <td></td>
       <td>
         <pre>
-psql> SELECT * FROM children    
+psql> SELECT * FROM kids    
       WHERE name='Ben' FOR UPDATE;
 <br>
  id | name | age
@@ -240,7 +240,7 @@ psql> SELECT * FROM children
       <td>5</td>
       <td>
         <pre>
-psql> UPDATE children SET age=13    
+psql> UPDATE kids SET age=13    
       WHERE name='Ben';
 ...
         </pre>
@@ -254,7 +254,7 @@ psql> UPDATE children SET age=13
       <td></td>
       <td>
         <pre>
-psql> UPDATE children    
+psql> UPDATE kids    
       SET age=14 WHERE name='Ann';
 <br>
 ERROR:  deadlock detected<br />
@@ -278,7 +278,7 @@ UPDATE 1
 psql> COMMIT;
 COMMIT
 <br>
-psql> SELECT * FROM children;
+psql> SELECT * FROM kids;
 <br>
  id | name | age
 ----+------+-----
