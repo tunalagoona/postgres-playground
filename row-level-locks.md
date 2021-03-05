@@ -318,9 +318,9 @@ psql> SELECT * FROM weather
 <br>
 id  |  the_date  | temperature
 ----+------------+-------------
-  3 | 2020-04-17 |          10
+  3 | 2020-04-17 |          22
         </pre>
-        <i>The <b>client#1</b> transaction acquires an exclusive </br>
+        <i>The <b>client#1</b> acquires an exclusive </br>
         row-level lock on the row without actually modifying it.</i>
       </td>
       <td></td>
@@ -330,51 +330,31 @@ id  |  the_date  | temperature
       <td></td>
       <td>
         <pre>
-psql> SELECT * FROM weather   
-      WHERE the_date='2020-04-17' FOR UPDATE;
+psql> UPDATE weather SET temperature=0
+      WHERE the_date='2020-04-17';
   ...
         </pre>
-        <i>The <b>client#2</b> transaction can't acquire </br>
-          an exclusive row-level lock on the row.</i>
+        <i>The <b>client#2</b> has to wait to acquire </br>
+          an exclusive row-level lock on the row (implicit or explicit).</i>
       </td>
     </tr>
     <tr>
       <td>5</td>
-      <td></td>
-      <td>
-        <i>Let's rollback the <b>client#1</b> transation </br>
-        so we could try to update the row.</i>
-        <pre>
-psql> ROLLBACK;
-ROLLBACK
-  <br>
-psql> START TRANSACTION;
-START TRANSACTION
-  <br>
-psql> UPDATE weather SET temperature=0   
-      WHERE the_date='2020-04-17';
-...
-        </pre>
-        <i>The query falls in a waiting mode until </br>
-        the <b>client#1</b> transaction releases the lock.</i>
-      </td>
-    </tr>
-    <tr>
-      <td>6</td>
       <td>
         <pre>
 psql> COMMIT;
 COMMIT
       </pre>
-        <i>The <b>client#1</b> transaction releases the lock.</i>
+        <i>The <b>client#1</b> releases the lock.</i>
       </td>
       <td></td>
     </tr>
     <tr>
-      <td>7</td>
+      <td>6</td>
       <td></td>
       <td>
         <pre>
+...
 UPDATE 1
 <br>
 psql> COMMIT;
@@ -388,7 +368,7 @@ psql> SELECT * FROM weather;
   2 | 2020-04-16 |           0
   3 | 2020-04-17 |           0
         </pre>
-        <i>The <b>client#2</b> transaction acquires the lock and updates the row.</i>
+        <i>The <b>client#2</b> acquires the lock and updates the row.</i>
       </td>
     </tr>
   </tbody>
