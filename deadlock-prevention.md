@@ -1,4 +1,4 @@
-## PostgreSQL DeadLock Prevention
+## DeadLock Prevention
 
 [Reference1](https://en.wikipedia.org/wiki/Deadlock)<br />
 [Reference2](https://ncona.com/2019/01/lock-hierarchies-to-avoid-deadlocks/)
