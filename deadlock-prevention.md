@@ -205,7 +205,7 @@ psql> SELECT * FROM locks
 ----+-------------
   1 | global lock
         </pre>
-        <i>The <b>client#1</b> acquires the "global lock" <br />
+        <i><b>Client#1</b> acquires the "global lock" <br />
           to be able to edit the rows in the roles table.</i>
       </td>
       <td></td>
@@ -219,7 +219,7 @@ psql> SELECT * FROM locks
       WHERE name='global lock' FOR UPDATE;
 ...
         </pre>
-        <i>The <b>client#2</b> falls into the waiting mode so it can not continue <br />
+        <i><b>Client#2</b> falls into the waiting mode so it can not continue <br />
           until the global lock is released by the <b>client#1</b>.</i>
       </td>
     </tr>
@@ -238,7 +238,7 @@ UPDATE 1
 psql> COMMIT;
 COMMIT
         </pre>
-        <i>The <b>client#1</b> releases the global lock.</i>
+        <i><b>Client#1</b> releases the global lock.</i>
       </td>
       <td></td>
     </tr>
@@ -252,7 +252,7 @@ COMMIT
 ----+-------------
   1 | global lock
         </pre>
-        <i>The <b>client#2</b> transaction acquires the lock <br />
+        <i><b>Client#2</b> transaction acquires the lock <br />
           and is now able to update the roles table.</i>
         <pre>
 psql> UPDATE roles SET role='Frodo Baggins'     
