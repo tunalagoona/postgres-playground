@@ -104,6 +104,11 @@ psql> UPDATE weather SET temperature=0
     </tr>
     <tr>
       <td>6</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>7</td>
       <td>
         <pre>
 psql> COMMIT;   
@@ -113,7 +118,7 @@ COMMIT
       <td></td>
     </tr>
     <tr>
-      <td>7</td>
+      <td>8</td>
       <td></td>
       <td>
         <pre>
@@ -127,7 +132,7 @@ UPDATE 1
       </td>
     </tr>
     <tr>
-      <td>8</td>
+      <td>9</td>
       <td></td>
       <td>
         <pre>
