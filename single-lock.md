@@ -29,7 +29,8 @@ psql> INSERT INTO weather (the_date, temperature) VALUES ('2020-04-17', 10);
 ### implicit exclusive row-level lock   
 
 > "(...) there are row-level locks, which can be exclusive or shared locks. An exclusive row-level lock on a specific row is automatically acquired when the row is updated or deleted. The lock is held until the transaction commits or rolls back, just like table-level locks. Row-level locks do not affect data querying; they block only writers to the same row."
-
+   
+   
 <table>
   <thead>
     <th>#</th>
@@ -106,7 +107,6 @@ psql> INSERT INTO weather (the_date, temperature) VALUES ('2020-04-17', 10);
       <td>
         <pre>
   psql> COMMIT;   
-
   COMMIT
         </pre>
       </td>
@@ -156,7 +156,8 @@ psql> INSERT INTO weather (the_date, temperature) VALUES ('2020-04-17', 10);
 ### explicit shared row-level lock   
 
 > "To acquire a shared row-level lock on a row, select the row with SELECT FOR SHARE. A shared lock does not prevent other transactions from acquiring the same shared lock. However, no transaction is allowed to update, delete, or exclusively lock a row on which any other transaction holds a shared lock. Any attempt to do so will block until the shared lock(s) have been released."
-
+   
+   
 <table>
   <thead>
     <th>#</th>
@@ -164,94 +165,95 @@ psql> INSERT INTO weather (the_date, temperature) VALUES ('2020-04-17', 10);
     <th>Client#2</th>
   </thead>
   <tbody>
-  <tr>
-    <td>1</td>
-    <td>
-      <pre>
-psql> START TRANSACTION;
-START TRANSACTION
-      </pre>
-    </td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>2</td>
-    <td></td>
-    <td>
-      <pre>
-psql> START TRANSACTION;
-START TRANSACTION
-      </pre>
-    </td>
-  </tr>
-  <tr>
-    <td>3</td>
-    <td>
-      <pre>
-psql> SELECT * FROM weather    
-      WHERE the_date='2020-04-16' FOR SHARE;
-<br> 
- id |  the_date  | temperature
-----+------------+-------------
-  2 | 2020-04-16 |           5
-      </pre>
-      <i>The transaction acquires a shared row-level lock on a row.</i>
-    </td>
-    <td></td>
-  </tr> 
-  <tr>
-    <td>4</td>
-    <td></td>
-    <td>
-      <pre>
-psql> SELECT * FROM weather    
-      WHERE the_date='2020-04-16' FOR SHARE;
-<br>
- id |  the_date  | temperature
-----+------------+-------------
-  2 | 2020-04-16 |           5
-      </pre>
-      <i>A shared lock does not prevent the second transaction    
+    <tr>
+      <td>1</td>
+      <td>
+        <pre>
+  psql> START TRANSACTION;
+  START TRANSACTION
+        </pre>
+      </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td></td>
+      <td>
+        <pre>
+  psql> START TRANSACTION;
+  START TRANSACTION
+        </pre>
+      </td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>
+        <pre>
+  psql> SELECT * FROM weather    
+        WHERE the_date='2020-04-16' FOR SHARE;
+  <br> 
+   id |  the_date  | temperature
+  ----+------------+-------------
+    2 | 2020-04-16 |           5
+        </pre>
+        <i>The <b>client#1</b> transaction acquires a shared row-level lock on the row.</i>
+      </td>
+      <td></td>
+    </tr> 
+    <tr>
+      <td>4</td>
+      <td></td>
+      <td>
+        <pre>
+  psql> SELECT * FROM weather    
+        WHERE the_date='2020-04-16' FOR SHARE;
+  <br>
+   id |  the_date  | temperature
+  ----+------------+-------------
+    2 | 2020-04-16 |           5
+        </pre>
+        <i>A shared lock, acquired by the <b>client#1</b>, </br>
+        does not prevent the <b>client#2</b> transaction  <br>  
         from acquiring the same shared lock.</i>
-    </td>
-  </tr> 
-  <tr>
-    <td>5</td>
-    <td></td>
-    <td>
-      <pre>
-psql> UPDATE weather SET temperature=0   
-      WHERE the_date='2020-04-16';  
-...
-      </pre>
-      <i>The second transaction is not allowed to update a row   
-        on which the first transaction holds a shared lock.</i>
-    </td>
-  </tr>
-  <tr>
-    <td>6</td>
-    <td>
-      <pre>
-psql> COMMIT;
-COMMIT
-      </pre>
-      <i>After the first transaction is committed,   
-        the shared lock on the row is released.</i>
-    </td>
-    <td></td>
-  </tr> 
-  <tr>
-    <td>7</td>
-    <td></td>
-    <td>
-      <pre>
-UPDATE 1
-      </pre>
-      <i>The second transaction is now allowed to acquire    
-        exclusive lock and update a row on which the first   
-        transaction holded a shared lock.</i>
-    </td>
-  </tr> 
+      </td>
+    </tr> 
+    <tr>
+      <td>5</td>
+      <td></td>
+      <td>
+        <pre>
+  psql> UPDATE weather SET temperature=0   
+        WHERE the_date='2020-04-16';  
+  ...
+        </pre>
+        <i>The <b>client#2</b> transaction is not allowed to update a row   
+          on which the <b>client#1</b> transaction holds a shared lock.</i>
+      </td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>
+        <pre>
+  psql> COMMIT;
+  COMMIT
+        </pre>
+        <i>After the <b>client#1</b> transaction is committed,   
+          the shared lock on the row is released.</i>
+      </td>
+      <td></td>
+    </tr> 
+    <tr>
+      <td>7</td>
+      <td></td>
+      <td>
+        <pre>
+  UPDATE 1
+        </pre>
+        <i>The <b>ck=lient#2</b> transaction is now allowed </br>
+        to acquire exclusive lock and update a row on which </br>
+        the <b>client#1</b> transaction holded a shared lock.</i>
+      </td>
+    </tr> 
   </tbody>
 </table>
 
@@ -267,7 +269,8 @@ UPDATE 1
 ### explicit exclusive row-level lock 
 
 > "To acquire an exclusive row-level lock on a row without actually modifying the row, select the row with SELECT FOR UPDATE. Note that once the row-level lock is acquired, the transaction can update the row multiple times without fear of conflicts."
-
+   
+   
 <table>
   <thead>
     <th>#</th>
