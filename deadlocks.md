@@ -39,8 +39,8 @@ psql> INSERT INTO children (name, age) VALUES ('Sam', 5);
       <td>1</td>
       <td>
         <pre>
-  psql> START TRANSACTION;
-  START TRANSACTION
+psql> START TRANSACTION;
+START TRANSACTION
         </pre>
       </td>
       <td></td>
@@ -50,8 +50,8 @@ psql> INSERT INTO children (name, age) VALUES ('Sam', 5);
       <td></td>
       <td>
         <pre>
-  psql> START TRANSACTION;
-  START TRANSACTION
+psql> START TRANSACTION;
+START TRANSACTION
         </pre>
       </td>
     </tr>
@@ -59,8 +59,8 @@ psql> INSERT INTO children (name, age) VALUES ('Sam', 5);
       <td>3</td>
       <td>
         <pre>
-  psql> UPDATE children SET age=10 WHERE name='Ann';
-  UPDATE 1
+psql> UPDATE children SET age=10 WHERE name='Ann';
+UPDATE 1
         </pre>
         <i>
           An exclusive row-level lock had been acquired by the <b>client#1</b>.<br />
@@ -74,8 +74,8 @@ psql> INSERT INTO children (name, age) VALUES ('Sam', 5);
       <td></td>
       <td>
         <pre>
-  psql> UPDATE children SET age=13 WHERE name='Ben';
-  UPDATE 1
+psql> UPDATE children SET age=13 WHERE name='Ben';
+UPDATE 1
         </pre>
         <i>
         An exclusive row-level lock had been acquired by the <b>client#2</b>.<br />
@@ -87,8 +87,8 @@ psql> INSERT INTO children (name, age) VALUES ('Sam', 5);
       <td>5</td>
       <td>
         <pre>
-  psql> UPDATE children SET age=9 WHERE name='Ben';
-  ...
+psql> UPDATE children SET age=9 WHERE name='Ben';
+...
         </pre>
         <i>The query stucks in a waiting mode. <br />
         <b>client#2</b> transaction holds the lock <br />
@@ -101,13 +101,13 @@ psql> INSERT INTO children (name, age) VALUES ('Sam', 5);
       <td></td>
       <td>
         <pre>
-  psql> UPDATE children SET age=5 WHERE name='Ann';
+psql> UPDATE children SET age=5 WHERE name='Ann';
 
-  ERROR:  deadlock detected
-  DETAIL:  Process 37184 waits for ShareLock <br />
-  on transaction 17500; blocked by process 37281.<br />
-  Process 37281 waits for ShareLock on transaction 17501; <br />
-  blocked by process 37184.
+ERROR:  deadlock detected
+DETAIL:  Process 37184 waits for ShareLock <br />
+on transaction 17500; blocked by process 37281.<br />
+Process 37281 waits for ShareLock on transaction 17501; <br />
+blocked by process 37184.
         </pre>
         <i>Two transactions each hold locks that the other wants.<br /> 
         PostgreSQL automatically detects deadlock situations <br />
@@ -128,14 +128,14 @@ psql> INSERT INTO children (name, age) VALUES ('Sam', 5);
       <td>
         <pre>psql> COMMIT;</pre>
         <pre>
-  psql> SELECT * FROM children;
-  <p>
-   id | name | age
-  ----+------+-----
-    1 | Ann  |   10
-    2 | Ben  |    9
-    3 | Sam  |    5
-  </p>
+psql> SELECT * FROM children;
+<p>
+ id | name | age
+----+------+-----
+  1 | Ann  |   10
+  2 | Ben  |    9
+  3 | Sam  |    5
+</p>
       </pre>
       <i>The changes are committed.</i>
       </td>
@@ -146,17 +146,17 @@ psql> INSERT INTO children (name, age) VALUES ('Sam', 5);
       <td></td>
       <td>
         <pre>
-  psql>COMMIT;
-  ROLLBACK</pre>
+psql>COMMIT;
+ROLLBACK</pre>
         <pre>
-  psql> SELECT * FROM children;
-  <p>
-   id | name | age
-  ----+------+-----
-    1 | Ann  |   10
-    2 | Ben  |    9
-    3 | Sam  |    5
-  </p>
+psql> SELECT * FROM children;
+<p>
+ id | name | age
+----+------+-----
+  1 | Ann  |   10
+  2 | Ben  |    9
+  3 | Sam  |    5
+</p>
       </pre>
         <i>The changes are rolled back.</i>
       </td>
