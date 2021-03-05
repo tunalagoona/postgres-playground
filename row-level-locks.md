@@ -64,11 +64,10 @@ START TRANSACTION
         <pre>
 psql> UPDATE weather SET temperature=11   
       WHERE the_date='2020-04-15';   
-<br>
 UPDATE 1
         </pre>
     <i>An exclusive row-level lock for the row </br>
-        is automatically acquired by the **client#1** when the row is updated.</i>
+        is automatically acquired by **Client#1** when the row is updated.</i>
       </td>
       <td></td>
     </tr>
@@ -84,8 +83,8 @@ psql> SELECT * FROM weather
 ----+------------+-------------
   1 | 2020-04-15 |           8
     </pre>
-        <i>The row-level lock acquired by the <b>client#1</b> </br>
-          does not affect the select statement issued by the <b>client#2</b>.</i>
+        <i>The row-level lock acquired by <b>Client#1</b> </br>
+          does not affect the select statement issued by <b>Client#2</b>.</i>
       </td>
     </tr>
     <tr>
@@ -94,11 +93,11 @@ psql> SELECT * FROM weather
       <td>
         <pre>
 psql> UPDATE weather SET temperature=22  
-      WHERE the_date='2020-04-17';  
+      WHERE the_date='2020-04-17';
 UPDATE 1
         </pre>
-        <i>The row-level lock acquired by the <b>client#1</b> </br>
-        does not affect the <b>client#2</b> from writing to a different row.</i>
+        <i>The row-level lock acquired by <b>Client#1</b> </br>
+        does not affect <b>Client#2</b> from writing to a different row.</i>
       </td>
     </tr>
     <tr>
@@ -108,11 +107,10 @@ UPDATE 1
         <pre>
 psql> UPDATE weather SET temperature=0    
       WHERE the_date='2020-04-15';   
-
-  ...
+...
         </pre>
-        <i>However, the row-level lock acquired by the <b>client#1</b> </br>
-        blocks the <b>client#2</b> from writing to the same row.</i>        
+        <i>However, the row-level lock acquired by <b>Client#1</b> </br>
+        blocks <b>Client#2</b> from writing to the same row.</i>        
       </td>
     </tr>
     <tr>
@@ -133,8 +131,8 @@ COMMIT
 ...
 UPDATE 1
         </pre>
-        <i>Once the <b>client#1</b> transaction is committed,  
-    the lock is released. The <b>client#2</b> acquires the lock and completes the update.</i>
+        <i>Once <b>Client#1</b> transaction is committed,  
+    the lock is released. <b>Client#2</b> acquires the lock and completes the update.</i>
       </td>
     </tr>
     <tr>
@@ -207,7 +205,7 @@ psql> SELECT * FROM weather
 ----+------------+-------------
   2 | 2020-04-16 |           5
       </pre>
-        <i>The <b>client#1</b> acquires a shared row-level lock on the row.</i>
+        <i><b>Client#1</b> acquires a shared row-level lock on the row.</i>
       </td>
       <td></td>
     </tr> 
@@ -223,8 +221,8 @@ psql> SELECT * FROM weather
 ----+------------+-------------
   2 | 2020-04-16 |           5
         </pre>
-        <i>A shared lock, acquired by the <b>client#1</b>, </br>
-        does not prevent the <b>client#2</b> <br>  
+        <i>A shared lock, acquired by <b>Client#1</b>, </br>
+        does not prevent <b>Client#2</b> <br>  
         from acquiring the same shared lock.</i>
       </td>
     </tr> 
@@ -237,8 +235,8 @@ psql> UPDATE weather SET temperature=0
       WHERE the_date='2020-04-16';  
   ...
         </pre>
-        <i>The <b>client#2</b> is not allowed to update a row   
-          on which the <b>client#1</b> holds a shared lock.</i>
+        <i><b>Client#2</b> is not allowed to update a row   
+          on which <b>Client#1</b> holds a shared lock.</i>
       </td>
     </tr>
     <tr>
@@ -248,7 +246,7 @@ psql> UPDATE weather SET temperature=0
 psql> COMMIT;
 COMMIT
         </pre>
-        <i>Once the <b>client#1</b> transaction is committed,   
+        <i>Once <b>Client#1</b> transaction is committed,   
           the shared lock on the row is released.</i>
       </td>
       <td></td>
@@ -261,7 +259,7 @@ COMMIT
 ...
 UPDATE 1
         </pre>
-        <i>The <b>client#2</b> is now allowed </br>
+        <i><b>Client#2</b> is now allowed </br>
         to acquire an exclusive lock and update the row.</i>
       </td>
     </tr> 
@@ -320,7 +318,7 @@ id  |  the_date  | temperature
 ----+------------+-------------
   3 | 2020-04-17 |          22
         </pre>
-        <i>The <b>client#1</b> acquires an exclusive </br>
+        <i><b>Client#1</b> acquires an exclusive </br>
         row-level lock on the row without actually modifying it.</i>
       </td>
       <td></td>
@@ -334,7 +332,7 @@ psql> UPDATE weather SET temperature=0
       WHERE the_date='2020-04-17';
   ...
         </pre>
-        <i>The <b>client#2</b> has to wait to acquire </br>
+        <i><b>Client#2</b> has to wait to acquire </br>
           an exclusive (implicit or explicit) row-level lock on the row.</i>
       </td>
     </tr>
@@ -345,7 +343,7 @@ psql> UPDATE weather SET temperature=0
 psql> COMMIT;
 COMMIT
       </pre>
-        <i>The <b>client#1</b> releases the lock.</i>
+        <i><b>Client#1</b> releases the lock.</i>
       </td>
       <td></td>
     </tr>
@@ -368,7 +366,7 @@ psql> SELECT * FROM weather;
   2 | 2020-04-16 |           0
   3 | 2020-04-17 |           0
         </pre>
-        <i>The <b>client#2</b> acquires the lock and updates the row.</i>
+        <i><b>Client#2</b> acquires the lock and updates the row.</i>
       </td>
     </tr>
   </tbody>
