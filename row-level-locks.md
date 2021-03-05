@@ -93,10 +93,9 @@ psql> SELECT * FROM weather
       <td></td>
       <td>
         <pre>
-psql> UPDATE weather SET temperature=22    
-      WHERE the_date='2020-04-17';   
-
-  ...
+psql> UPDATE weather SET temperature=22  
+      WHERE the_date='2020-04-17';  
+UPDATE 1
         </pre>
         <i>The row-level lock acquired by the <b>client#1</b> </br>
         does not affect the <b>client#2</b> from writing to a different row.</i>
@@ -162,7 +161,7 @@ psql> SELECT * FROM weather;
 | ----------- | ----------- | ----------- |
 |1|2020-04-15|0|
 |2|2020-04-16|5|  
-|3|2020-04-17|10| 
+|3|2020-04-17|22| 
 <br>
 
 ### Explicit shared row-level lock (SELECT FOR SHARE)
@@ -208,7 +207,7 @@ psql> SELECT * FROM weather
 ----+------------+-------------
   2 | 2020-04-16 |           5
       </pre>
-        <i>The <b>client#1</b> transaction acquires a shared row-level lock on the row.</i>
+        <i>The <b>client#1</b> acquires a shared row-level lock on the row.</i>
       </td>
       <td></td>
     </tr> 
@@ -225,7 +224,7 @@ psql> SELECT * FROM weather
   2 | 2020-04-16 |           5
         </pre>
         <i>A shared lock, acquired by the <b>client#1</b>, </br>
-        does not prevent the <b>client#2</b> transaction  <br>  
+        does not prevent the <b>client#2</b> <br>  
         from acquiring the same shared lock.</i>
       </td>
     </tr> 
@@ -238,8 +237,8 @@ psql> UPDATE weather SET temperature=0
       WHERE the_date='2020-04-16';  
   ...
         </pre>
-        <i>The <b>client#2</b> transaction is not allowed to update a row   
-          on which the <b>client#1</b> transaction holds a shared lock.</i>
+        <i>The <b>client#2</b> is not allowed to update a row   
+          on which the <b>client#1</b> holds a shared lock.</i>
       </td>
     </tr>
     <tr>
@@ -249,7 +248,7 @@ psql> UPDATE weather SET temperature=0
 psql> COMMIT;
 COMMIT
         </pre>
-        <i>After the <b>client#1</b> transaction is committed,   
+        <i>Once the <b>client#1</b> transaction is committed,   
           the shared lock on the row is released.</i>
       </td>
       <td></td>
@@ -259,11 +258,11 @@ COMMIT
       <td></td>
       <td>
         <pre>
+...
 UPDATE 1
         </pre>
-        <i>The <b>ck=lient#2</b> transaction is now allowed </br>
-        to acquire exclusive lock and update a row on which </br>
-        the <b>client#1</b> transaction holded a shared lock.</i>
+        <i>The <b>client#2</b> is now allowed </br>
+        to acquire an exclusive lock and update the row.</i>
       </td>
     </tr> 
   </tbody>
@@ -275,7 +274,7 @@ UPDATE 1
 | ----------- | ----------- | ----------- |
 |1|2020-04-15|0|
 |2|2020-04-16|0|  
-|3|2020-04-17|10| 
+|3|2020-04-17|22| 
 <br>
 
 ### Explicit exclusive row-level lock (SELECT FOR UPDATE)
