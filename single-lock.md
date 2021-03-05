@@ -1,7 +1,9 @@
 
 ## PostgreSQL Single Locks
 
-Let's create a table and populate it with values:
+[Reference](https://www.postgresql.org/docs/9.1/explicit-locking.html)
+
+### Database structure:
 
 ```
 psql> CREATE TABLE weather (  
@@ -25,107 +27,120 @@ psql> INSERT INTO weather (the_date, temperature) VALUES ('2020-04-17', 10);
 
    
 ### implicit exclusive row-level lock   
+
+> "(...) there are row-level locks, which can be exclusive or shared locks. An exclusive row-level lock on a specific row is automatically acquired when the row is updated or deleted. The lock is held until the transaction commits or rolls back, just like table-level locks. Row-level locks do not affect data querying; they block only writers to the same row."
+
 <table>
   <thead>
-    <th>Client1</th>
-    <th>Client2</th>
+    <th>#</th>
+    <th>Client#1</th>
+    <th>Client#2</th>
   </thead>
   <tbody>
-  <tr>
-    <td>
-      <pre>
-psql> START TRANSACTION;
-START TRANSACTION
-      </pre>
-    </td>
-    <td></td>
-  </tr>
-  <tr>
-    <td></td>
-    <td>
-      <pre>
-psql> START TRANSACTION;
-START TRANSACTION
-      </pre>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <pre>
-psql> UPDATE weather SET temperature=11   
-      WHERE the_date='2020-04-15';   
-      
-UPDATE 1
-      </pre>
-  <i>An exclusive row-level lock on the row </br>
-      is automatically acquired when the row is updated.</i>
-    </td>
-    <td></td>
-  </tr>
-  <tr>
-    <td></td>
-    <td>
-      <pre>
-psql> SELECT * FROM weather    
-      WHERE the_date='2020-04-15';   
-<br>
- id |  the_date  | temperature
-----+------------+-------------
-  1 | 2020-04-15 |           8
-    </pre>
-      <i>Row-level lock doesn't affect data querying.</i>
-    </td>
-  </tr>
-  <tr>
-    <td></td>
-    <td>
-      <pre>
-psql> UPDATE weather SET temperature=0    
-      WHERE the_date='2020-04-15';   
+    <tr>
+      <td>1</td>
+      <td>
+        <pre>
+  psql> START TRANSACTION;
+  START TRANSACTION
+        </pre>
+      </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td></td>
+      <td>
+        <pre>
+  psql> START TRANSACTION;
+  START TRANSACTION
+        </pre>
+      </td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>
+        <pre>
+  psql> UPDATE weather SET temperature=11   
+        WHERE the_date='2020-04-15';   
 
-...
+  UPDATE 1
+        </pre>
+    <i>An exclusive row-level lock on the row </br>
+        is automatically acquired by the **client#1** when the row is updated.</i>
+      </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td></td>
+      <td>
+        <pre>
+  psql> SELECT * FROM weather    
+        WHERE the_date='2020-04-15';   
+  <br>
+   id |  the_date  | temperature
+  ----+------------+-------------
+    1 | 2020-04-15 |           8
       </pre>
-      <i>Row-level lock blocks the writer to the same row.</i>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <pre>
-psql> COMMIT;   
+        <i>Row-level lock, acquired by the <b>client#1</b>, </br>
+          doesn't affect data querying by the <b>client#2</b>.</i>
+      </td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td></td>
+      <td>
+        <pre>
+  psql> UPDATE weather SET temperature=0    
+        WHERE the_date='2020-04-15';   
 
-COMMIT
-      </pre>
-    </td>
-    <td></td>
-  </tr>
-  <tr>
-    <td></td>
-    <td>
-      <pre>
-psql> UPDATE weather SET temperature=0    
-      WHERE the_date='2020-04-15';
+  ...
+        </pre>
+        <i>Row-level lock, acquired by the <b>client#1</b>,</br>
+        blocks the <b>client#2</b> writing to the same row.</i>
+      </td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>
+        <pre>
+  psql> COMMIT;   
 
-UPDATE 1
-      </pre>
-      <i>After the first transaction is committed,  
-      the lock is released. Another writer can acquire the lock.</i>
-    </td>
-  </tr>
-  <tr>
-    <td></td>
-    <td>
-      <pre>
-psql> SELECT * FROM weather;   
-<br>
- id |  the_date  | temperature
-----+------------+-------------
-  2 | 2020-04-16 |           5
-  3 | 2020-04-17 |          10
-  1 | 2020-04-15 |           0
-      </pre>
-    </td>
-  </tr>
-  
+  COMMIT
+        </pre>
+      </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td></td>
+      <td>
+        <pre>
+  psql> UPDATE weather SET temperature=0    
+        WHERE the_date='2020-04-15';
+
+  UPDATE 1
+        </pre>
+        <i>After the <b>client#1</b> transaction is committed,  
+    the lock is released. <b>client#2</b> transaction can acquire the lock.</i>
+      </td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td></td>
+      <td>
+        <pre>
+  psql> SELECT * FROM weather;   
+  <br>
+   id |  the_date  | temperature
+  ----+------------+-------------
+    2 | 2020-04-16 |           5
+    3 | 2020-04-17 |          10
+    1 | 2020-04-15 |           0
+        </pre>
+      </td>
+    </tr>
   </tbody>
 </table>
 
@@ -139,13 +154,18 @@ psql> SELECT * FROM weather;
 <br>
 
 ### explicit shared row-level lock   
+
+> "To acquire a shared row-level lock on a row, select the row with SELECT FOR SHARE. A shared lock does not prevent other transactions from acquiring the same shared lock. However, no transaction is allowed to update, delete, or exclusively lock a row on which any other transaction holds a shared lock. Any attempt to do so will block until the shared lock(s) have been released."
+
 <table>
   <thead>
-    <th>Client1</th>
-    <th>Client2</th>
+    <th>#</th>
+    <th>Client#1</th>
+    <th>Client#2</th>
   </thead>
   <tbody>
   <tr>
+    <td>1</td>
     <td>
       <pre>
 psql> START TRANSACTION;
@@ -155,6 +175,7 @@ START TRANSACTION
     <td></td>
   </tr>
   <tr>
+    <td>2</td>
     <td></td>
     <td>
       <pre>
@@ -164,6 +185,7 @@ START TRANSACTION
     </td>
   </tr>
   <tr>
+    <td>3</td>
     <td>
       <pre>
 psql> SELECT * FROM weather    
@@ -178,6 +200,7 @@ psql> SELECT * FROM weather
     <td></td>
   </tr> 
   <tr>
+    <td>4</td>
     <td></td>
     <td>
       <pre>
@@ -193,6 +216,7 @@ psql> SELECT * FROM weather
     </td>
   </tr> 
   <tr>
+    <td>5</td>
     <td></td>
     <td>
       <pre>
@@ -205,6 +229,7 @@ psql> UPDATE weather SET temperature=0
     </td>
   </tr>
   <tr>
+    <td>6</td>
     <td>
       <pre>
 psql> COMMIT;
@@ -216,6 +241,7 @@ COMMIT
     <td></td>
   </tr> 
   <tr>
+    <td>7</td>
     <td></td>
     <td>
       <pre>
@@ -240,13 +266,17 @@ UPDATE 1
 
 ### explicit exclusive row-level lock 
 
+> "To acquire an exclusive row-level lock on a row without actually modifying the row, select the row with SELECT FOR UPDATE. Note that once the row-level lock is acquired, the transaction can update the row multiple times without fear of conflicts."
+
 <table>
   <thead>
-    <th>Client1</th>
-    <th>Client2</th>
+    <th>#</th>
+    <th>Client#1</th>
+    <th>Client#2</th>
   </thead>
   <tbody>
   <tr>
+    <td>1</td>
     <td>
       <pre>
 psql> START TRANSACTION;
@@ -256,6 +286,7 @@ START TRANSACTION
     <td></td>
   </tr>
   <tr>
+    <td>2</td>
     <td></td>
     <td>
       <pre>
@@ -265,6 +296,7 @@ START TRANSACTION
     </td>
   </tr>
   <tr>
+    <td>3</td>
     <td>
       <pre>
 psql> SELECT * FROM weather   
@@ -280,6 +312,7 @@ id |  the_date  | temperature
     <td></td>
   </tr>
   <tr>
+    <td>4</td>
     <td></td>
     <td>
       <pre>
@@ -292,6 +325,7 @@ psql> SELECT * FROM weather
     </td>
   </tr>
   <tr>
+    <td>5</td>
     <td></td>
     <td>
       <i>Let's rollback the second transation so we could try to update the row.</i>
@@ -310,6 +344,7 @@ psql> UPDATE weather SET temperature=0
     </td>
   </tr>
   <tr>
+    <td>6</td>
     <td>
       <pre>
 psql> COMMIT;
@@ -320,6 +355,7 @@ COMMIT
     <td></td>
   </tr>
   <tr>
+    <td>7</td>
     <td></td>
     <td>
       <pre>
