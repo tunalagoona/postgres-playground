@@ -64,7 +64,7 @@ START TRANSACTION
         <pre>
 psql> UPDATE weather SET temperature=11   
       WHERE the_date='2020-04-15';   
-
+<br>
 UPDATE 1
         </pre>
     <i>An exclusive row-level lock for the row </br>
@@ -79,7 +79,7 @@ UPDATE 1
         <pre>
 psql> SELECT * FROM weather    
       WHERE the_date='2020-04-15';   
-  <br>
+<br>
  id |  the_date  | temperature
 ----+------------+-------------
   1 | 2020-04-15 |           8
