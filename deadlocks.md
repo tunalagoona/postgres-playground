@@ -25,7 +25,7 @@ psql> INSERT INTO kids (name, age) VALUES ('Sam', 5);
 |3|Sam|5| 
    
 
-### Deadlock on implicit exclusive row-level locks 
+### Deadlock on implicit exclusive row-level locks (ordinary UPDATE)
    
    
 <table>
@@ -134,7 +134,6 @@ psql> SELECT * FROM kids;
   3 | Sam  |    5
 </p>
       </pre>
-      <i>The changes are committed.</i>
       </td>
       <td></td>
     </tr>
@@ -151,7 +150,7 @@ psql> SELECT * FROM kids;
 <br>
 
 
-### Deadlock on explicit exclusive row-level locks    
+### Deadlock on explicit exclusive row-level locks (SELECT FOR UPDATE)
    
    
 <table>
@@ -192,7 +191,7 @@ psql> SELECT * FROM kids
 ----+------+-----
   1 | Ann  |  10
         </pre>
-        <i>The <b>client#1</b> transaction acquires exclusive <br />
+        <i>The <b>client#1</b> acquires an exclusive <br />
           row-level lock on the 'Ann' row.</i>
       </td>
       <td></td>
@@ -209,7 +208,7 @@ psql> SELECT * FROM kids
 ----+------+-----
   2 | Ben  |   9
         </pre>
-        <i>The <b>client#2</b> transaction acquires exclusive<br /> 
+        <i>The <b>client#2</b> acquires an exclusive<br /> 
           row-level lock on the 'Ben' row.</i>
       </td>
     </tr>
@@ -221,8 +220,8 @@ psql> UPDATE kids SET age=13
       WHERE name='Ben';
 ...
         </pre>
-        <i>The <b>client#1</b> transaction attempts to update<br />
-          the 'Ben' row and falls in a waiting mode.</i>
+        <i>The <b>client#1</b> attempts to update<br />
+          the 'Ben' row and falls into the waiting mode.</i>
       </td>
       <td></td>
     </tr>
@@ -240,10 +239,9 @@ on transaction 17685; blocked by process 84586.  <br />
 Process 84586 waits for ShareLock    <br />
 on transaction 17686; blocked by process 42439.
         </pre>
-        <i>The <b>client#2</b> transaction attempts<br />
-          to update the 'Ann' row. Postgres detects deadlock<br />    
-          and aborts the query, allowing the <b>client#1</b> transaction<br />     
-          to succeed.</i>
+        <i>The <b>client#2</b> attempts<br />
+          to update the 'Ann' row. Postgres detects the deadlock<br />    
+          and aborts the query, allowing the <b>client#1</b> to succeed.</i>
       </td>
     </tr>
     <tr>
@@ -263,8 +261,6 @@ psql> SELECT * FROM kids;
   1 | Ann  |  10
   2 | Ben  |  13
         </pre>
-        <i>The <b>client#1</b> transaction updates the 'Ben' row<br />  
-          and releases the lock upon commit.</i>
       </td>
       <td></td>
     </tr> 
