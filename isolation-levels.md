@@ -2,7 +2,7 @@
 
 [Reference](https://www.postgresql.org/docs/current/transaction-iso.html)
 
-### Database structure:
+### Database Structure
 
 ```
 psql> CREATE TABLE kids (  
