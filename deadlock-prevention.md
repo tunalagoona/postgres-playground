@@ -1,20 +1,19 @@
-## DeadLock Prevention
+## Deadlock Prevention
 
-[Reference1](https://en.wikipedia.org/wiki/Deadlock)<br />
-[Reference2](https://ncona.com/2019/01/lock-hierarchies-to-avoid-deadlocks/)
+[Deadlock: Wikipedia](https://en.wikipedia.org/wiki/Deadlock)  
+[Lock hierarchies to avoid deadlocks](https://ncona.com/2019/01/lock-hierarchies-to-avoid-deadlocks/)
 
-A deadlock situation on a resource can arise only if all of the following conditions hold simultaneously (Coffman conditions):  
+For the deadlock to happen, all of the following conditions must hold:
+* Mutual exclusion
+* Hold and wait
+* No preemption
+* Circular wait
 
-- Mutual exclusion
-- Hold and wait or resource holding
-- No preemption
-- Circular wait
+To prevent the deadlock, it is enough to avert one of these conditions; here we consider averting **hold and wait** and **circular wait**.  
 
-Most deadLock prevention approaches work by preventing one of the four Coffman conditions from occurring. 
-In this case study two of them will be considered - **the hold and wait** and **circular wait**.  
+To avert the **hold and wait** condition, we can require the processes to request all the resources they need before starting up or by replacing multiple fine-grained locks with a single coarse-grained lock.
 
-Prevention of **hold and wait** can be gained, for instance, by requiring processes to request all the resources they will need before starting up or by serializing execution of transactions.
-To avoid **circular waits**, resources may be ordered and we can ensure that each process can request resources only in an increasing order of these numbers.
+To avert the **circular wait** condition, we can order the resources and make each process to request resources only in the increasing order, essentially mimicking the lock hierarchy.
 
 ### Database structure:
 
@@ -40,8 +39,7 @@ psql> INSERT INTO roles (name, role) VALUES ('Andy Serkis', 'Gollum');
    
 ### Multiple transactions
 
-One of the simplest approaches to prevent DeadLock is to divide one transaction into many so that no transaction would wait for another to complete.   
-This approach prevents **hold and wait** condition.
+One of the simplest approaches to prevent the deadlock from happenning is to divide a single transaction into many so that no transaction would wait for another to complete. This approach prevents the **hold and wait** condition.
 
 <table>
   <thead>
@@ -147,8 +145,7 @@ COMMIT
 
 ### Explicit global lock
 
-We can make a table with locks to imitate global lock acquisition. The transactions will need to acquire this lock before starting up. By this we can serialize execution of transactions.
-This approach prevents **hold and wait** condition.
+We can make an auxiliary table carrying coarse-grained locks, which the clients will need to acquire before issuing any changes. This approach also prevents the **hold and wait** condition.
 
 ```
 psql> CREATE TABLE locks (
@@ -203,7 +200,7 @@ psql> SELECT * FROM locks
   1 | global lock
         </pre>
         <i>The <b>client#1</b> acquires the "global lock" <br />
-          to be able to edit the rows in the table.</i>
+          to be able to edit the rows in the roles table.</i>
       </td>
       <td></td>
     </tr>
@@ -216,8 +213,8 @@ psql> SELECT * FROM locks
       WHERE name='global lock' FOR UPDATE;
 ...
         </pre>
-        <i>The <b>client#2</b> transaction falls in a waiting mode so he can't edit <br />
-          the rows in the table until the lock is released.</i>
+        <i>The <b>client#2</b> falls into the waiting mode so it can not continue <br />
+          until the global lock is released by the <b>client#1</b>.</i>
       </td>
     </tr>
     <tr>
@@ -235,7 +232,7 @@ UPDATE 1
 psql> COMMIT;
 COMMIT
         </pre>
-        <i>The <b>client#1</b> transactiopn releases the lock.</i>
+        <i>The <b>client#1</b> releases the global lock.</i>
       </td>
       <td></td>
     </tr>
@@ -244,6 +241,7 @@ COMMIT
       <td></td>
       <td>
         <pre>
+...
  id |    name
 ----+-------------
   1 | global lock
