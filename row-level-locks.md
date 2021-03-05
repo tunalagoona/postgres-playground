@@ -112,7 +112,7 @@ UPDATE 1
       <td>
         <pre>
 psql> UPDATE weather SET temperature=0    
-      WHERE the_date='2020-04-15';   
+      WHERE the_date='2020-04-15';<br>   
 ...
         </pre>
         <i>However, the row-level lock acquired by <b>Client#1</b> </br>
@@ -134,7 +134,7 @@ COMMIT
       <td></td>
       <td>
         <pre>
-...
+...<br>
 UPDATE 1
         </pre>
         <i>Once <b>Client#1</b> transaction is committed,</br>
@@ -242,7 +242,7 @@ psql> SELECT * FROM weather
       <td>
         <pre>
 psql> UPDATE weather SET temperature=0   
-      WHERE the_date='2020-04-16';  
+      WHERE the_date='2020-04-16'; <br> 
   ...
         </pre>
         <i><b>Client#2</b> is not allowed to update a row   
@@ -266,7 +266,7 @@ COMMIT
       <td></td>
       <td>
         <pre>
-...
+...<br>
 UPDATE 1
         </pre>
         <i><b>Client#2</b> is now allowed </br>
@@ -342,7 +342,7 @@ id  |  the_date  | temperature
       <td>
         <pre>
 psql> UPDATE weather SET temperature=0
-      WHERE the_date='2020-04-17';
+      WHERE the_date='2020-04-17';<br>
   ...
         </pre>
         <i><b>Client#2</b> has to wait to acquire </br>
@@ -365,7 +365,7 @@ COMMIT
       <td></td>
       <td>
         <pre>
-...
+...<br>
 UPDATE 1
 <br>
 psql> COMMIT;
