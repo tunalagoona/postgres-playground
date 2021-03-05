@@ -1,7 +1,7 @@
 ## Deadlock Prevention
 
-[Deadlock: Wikipedia](https://en.wikipedia.org/wiki/Deadlock)  
-[Lock hierarchies to avoid deadlocks](https://ncona.com/2019/01/lock-hierarchies-to-avoid-deadlocks/)
+[Reference: deadlock (Wikipedia)](https://en.wikipedia.org/wiki/Deadlock)  
+[Reference: lock hierarchies to avoid deadlocks](https://ncona.com/2019/01/lock-hierarchies-to-avoid-deadlocks/)
 
 For the deadlock to happen, all of the following conditions must hold:
 * Mutual exclusion
