@@ -247,7 +247,7 @@ COMMIT
   1 | global lock
         </pre>
         <i>The <b>client#2</b> transaction acquires the lock <br />
-          and gets the right to edit the rows in the table.</i>
+          and is now able to update the roles table.</i>
         <pre>
 psql> UPDATE roles SET role='Frodo Baggins'     
       WHERE name='Andy Serkis';
@@ -277,10 +277,9 @@ COMMIT
 
 ### Lock hierarchy
 
-A lock hierarchy consists of designing an application in a way that locks can be only acquired in a specific order.
-This approach prevents **circular waits** condition.
+A lock hierarchy means that we design the application in the way that locks can be only acquired in a specific order. This approach prevents the **circular wait** condition.
 
-Let's make the clients to update the rows in a sorted order. <b>client#1</b> transaction is going to update rows with id=1 and id=2, and <b>client#2</b> transasction - rows with id=2 and id=3.
+Here we force the clients to update the rows in the increasing order of their ids. The <b>client#1</b> will be updating rows 1 and 2, and the <b>client#2</b> will be updating rows 2 and 3.
 
 <table>
   <thead>
@@ -316,8 +315,8 @@ START TRANSACTION;
 psql> UPDATE roles SET role='Tauriel'  WHERE id=1;
 UPDATE 1
         </pre>
-        <i><b>client#1</b> transaction acquires lock <br />
-          on the row with id=1.</i>
+        <i><b>Client#1</b> acquires the lock <br/>
+          on the row 1.</i>
       </td>
       <td></td>
     </tr>
@@ -329,8 +328,8 @@ UPDATE 1
 psql> UPDATE roles SET role='Galadriel'  WHERE id=2;
 UPDATE 1
         </pre>
-        <i><b>client#2</b> transaction acquires lock <br />
-          on the row with id=2.</i>
+        <i><b>Client#2</b> acquires the lock <br/>
+          on the row 2.</i>
       </td>
     </tr>
     <tr>
@@ -340,8 +339,8 @@ UPDATE 1
 psql> UPDATE roles SET role='Sam'  WHERE id=2;
 ...
         </pre>
-        <i><b>client#1</b> transaction tries to acquire the lock <br />
-          on the row with id=2 and falls in a waiting mode.</i>
+        <i><b>Client#1</b> tries to acquire the lock <br />
+          on the row 2 and falls into the waiting mode.</i>
       </td>
       <td></td>
     </tr>
@@ -356,9 +355,9 @@ UPDATE 1
 psql> COMMIT;
 COMMIT
         </pre>
-        <i><b>client#2</b> transaction acquires the lock <br />
-          on the row with id=3, completes the query and commits, <br />
-          releasing the lock on the row with id=2.</i>
+        <i><b>Client#2</b> acquires the lock <br />
+          on the row 3 and commits, <br />
+          releasing the lock on the row 2.</i>
       </td>
     </tr>
     <tr>
@@ -370,8 +369,8 @@ UPDATE 1
 psql> COMMIT;
 COMMIT
         </pre>
-        <i><b>client#1</b> transaction acquires the lock <br />
-          on the row with id=2, completes the query and commits.</i>
+        <i>Now <b>client#1</b> is able to acquire the lock <br />
+          on the row 2 and commit.</i>
       </td>
       <td></td>
     </tr>
