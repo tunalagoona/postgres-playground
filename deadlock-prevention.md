@@ -1,6 +1,6 @@
 ## PostgreSQL DeadLock Prevention
 
-[Reference1](https://en.wikipedia.org/wiki/Deadlock)
+[Reference1](https://en.wikipedia.org/wiki/Deadlock)<br />
 [Reference2](https://ncona.com/2019/01/lock-hierarchies-to-avoid-deadlocks/)
 
 A deadlock situation on a resource can arise only if all of the following conditions hold simultaneously (Coffman conditions):  
