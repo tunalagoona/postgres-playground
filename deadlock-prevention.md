@@ -1,5 +1,8 @@
 ## PostgreSQL DeadLock Prevention
 
+[Reference1](https://en.wikipedia.org/wiki/Deadlock)
+[Reference2](https://ncona.com/2019/01/lock-hierarchies-to-avoid-deadlocks/)
+
 A deadlock situation on a resource can arise only if all of the following conditions hold simultaneously (Coffman conditions):  
 
 - Mutual exclusion
@@ -8,12 +11,12 @@ A deadlock situation on a resource can arise only if all of the following condit
 - Circular wait
 
 Most deadLock prevention approaches work by preventing one of the four Coffman conditions from occurring. 
-In this case study we will play with two of them - **the hold and wait** and **circular wait**.  
+In this case study two of them will be considered - **the hold and wait** and **circular wait**.  
 
 Prevention of **hold and wait** can be gained, for instance, by requiring processes to request all the resources they will need before starting up or by serializing execution of transactions.
 To avoid **circular waits**, resources may be ordered and we can ensure that each process can request resources only in an increasing order of these numbers.
 
-Let's make a table to concurrently update the data from the two transactions:
+### Database structure:
 
 ```
 psql> CREATE TABLE roles (  
@@ -42,11 +45,13 @@ This approach prevents **hold and wait** condition.
 
 <table>
   <thead>
-    <th>Client1</th>
-    <th>Client2</th>
+    <th>#</th>
+    <th>Client#1</th>
+    <th>Client#2</th>
   </thead>
   <tbody>
     <tr>
+      <td>1</td>
       <td>
         <pre>
 psql> START TRANSACTION;
@@ -56,6 +61,7 @@ START TRANSACTION;
       <td></td>
     </tr>
     <tr>
+      <td>2</td>
       <td></td>
       <td>
         <pre>
@@ -65,6 +71,7 @@ START TRANSACTION;
       </td>
     </tr>
     <tr>
+      <td>3</td>
       <td>
         <pre>
 psql> UPDATE roles SET role='Frodo Baggins'    
@@ -78,6 +85,7 @@ COMMIT
       <td></td>
     </tr>
     <tr>
+      <td>4</td>
       <td></td>
       <td>
         <pre>
@@ -91,6 +99,7 @@ COMMIT
       </td>
     </tr>
     <tr>
+      <td>5</td>
       <td>
         <pre>
 psql> START TRANSACTION;
@@ -107,6 +116,7 @@ COMMIT
       <td></td>
     </tr>
     <tr>
+      <td>6</td>
       <td></td>
       <td>
         <pre>
@@ -121,10 +131,6 @@ psql> COMMIT;
 COMMIT
         </pre>
       </td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
     </tr>
   </tbody>
 </table>
@@ -160,11 +166,13 @@ psql> INSERT INTO locks (name) VALUES ('global lock');
 
 <table>
   <thead>
-    <th>Client1</th>
-    <th>Client2</th>
+    <th>#</th>
+    <th>Client#1</th>
+    <th>Client#2</th>
   </thead>
   <tbody>
     <tr>
+      <td>1</td>
       <td>
         <pre>
 psql> START TRANSACTION;
@@ -174,6 +182,7 @@ START TRANSACTION;
       <td></td>
     </tr>
     <tr>
+      <td>2</td>
       <td></td>
       <td>
         <pre>
@@ -183,6 +192,7 @@ START TRANSACTION;
       </td>
     </tr>
     <tr>
+      <td>3</td>
       <td>
         <pre>
 psql> SELECT * FROM locks    
@@ -192,11 +202,13 @@ psql> SELECT * FROM locks
 ----+-------------
   1 | global lock
         </pre>
-        <i>The first client acquires "global lock" to get a right to edit the rows in the table.</i>
+        <i>The <b>client#1</b> acquires the "global lock" <br />
+          to be able to edit the rows in the table.</i>
       </td>
       <td></td>
     </tr>
     <tr>
+      <td>4</td>
       <td></td>
       <td>
         <pre>
@@ -204,10 +216,12 @@ psql> SELECT * FROM locks
       WHERE name='global lock' FOR UPDATE;
 ...
         </pre>
-        <i>The second client falls in a waiting mode so he can't edit the rows in the table until the lock is released.</i>
+        <i>The <b>client#2</b> transaction falls in a waiting mode so he can't edit <br />
+          the rows in the table until the lock is released.</i>
       </td>
     </tr>
     <tr>
+      <td>5</td>
       <td>
         <pre>
 psql> UPDATE roles SET role='Boromir'    
@@ -221,11 +235,12 @@ UPDATE 1
 psql> COMMIT;
 COMMIT
         </pre>
-        <i>The first client releases the lock.</i>
+        <i>The <b>client#1</b> transactiopn releases the lock.</i>
       </td>
       <td></td>
     </tr>
     <tr>
+      <td>6</td>
       <td></td>
       <td>
         <pre>
@@ -233,7 +248,8 @@ COMMIT
 ----+-------------
   1 | global lock
         </pre>
-        <i>The second client acquires the lock and gets the right to edit the rows in the table.</i>
+        <i>The <b>client#2</b> transaction acquires the lock <br />
+          and gets the right to edit the rows in the table.</i>
         <pre>
 psql> UPDATE roles SET role='Frodo Baggins'     
       WHERE name='Andy Serkis';
@@ -263,16 +279,20 @@ COMMIT
 
 ### Lock hierarchy
 
-Description
+A lock hierarchy consists of designing an application in a way that locks can be only acquired in a specific order.
 This approach prevents **circular waits** condition.
+
+Let's make the clients to update the rows in a sorted order. <b>client#1</b> transaction is going to update rows with id=1 and id=2, and <b>client#2</b> transasction - rows with id=2 and id=3.
 
 <table>
   <thead>
-    <th>Client1</th>
-    <th>Client2</th>
+    <th>#</th>
+    <th>Client#1</th>
+    <th>Client#2</th>
   </thead>
   <tbody>
     <tr>
+      <td>1</td>
       <td>
         <pre>
 psql> START TRANSACTION;
@@ -282,6 +302,7 @@ START TRANSACTION;
       <td></td>
     </tr>
     <tr>
+      <td>2</td>
       <td></td>
       <td>
         <pre>
@@ -289,6 +310,72 @@ psql> START TRANSACTION;
 START TRANSACTION;
         </pre>
       </td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>
+        <pre>
+psql> UPDATE roles SET role='Tauriel'  WHERE id=1;
+UPDATE 1
+        </pre>
+        <i><b>client#1</b> transaction acquires lock <br />
+          on the row with id=1.</i>
+      </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td></td>
+      <td>
+        <pre>
+psql> UPDATE roles SET role='Galadriel'  WHERE id=2;
+UPDATE 1
+        </pre>
+        <i><b>client#2</b> transaction acquires lock <br />
+          on the row with id=2.</i>
+      </td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>
+        <pre>
+psql> UPDATE roles SET role='Sam'  WHERE id=2;
+...
+        </pre>
+        <i><b>client#1</b> transaction tries to acquire the lock <br />
+          on the row with id=2 and falls in a waiting mode.</i>
+      </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td></td>
+      <td>
+        <pre>
+psql> UPDATE roles SET role='Ork 1'  WHERE id=3;
+UPDATE 1
+<br />
+psql> COMMIT;
+COMMIT
+        </pre>
+        <i><b>client#2</b> transaction acquires the lock <br />
+          on the row with id=3, completes the query and commits, <br />
+          releasing the lock on the row with id=2.</i>
+      </td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>
+        <pre>
+UPDATE 1
+<br />
+psql> COMMIT;
+COMMIT
+        </pre>
+        <i><b>client#1</b> transaction acquires the lock <br />
+          on the row with id=2, completes the query and commits.</i>
+      </td>
+      <td></td>
     </tr>
   </tbody>
 </table>
