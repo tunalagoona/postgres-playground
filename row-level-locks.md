@@ -93,19 +93,28 @@ psql> SELECT * FROM weather
       <td></td>
       <td>
         <pre>
+psql> UPDATE weather SET temperature=22    
+      WHERE the_date='2020-04-17';   
+
+  ...
+        </pre>
+        <i>The row-level lock acquired by the <b>client#1</b> </br>
+        does not affect the <b>client#2</b> from writing to a different row.</i>
+      </td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td></td>
+      <td>
+        <pre>
 psql> UPDATE weather SET temperature=0    
       WHERE the_date='2020-04-15';   
 
   ...
         </pre>
         <i>However, the row-level lock acquired by the <b>client#1</b> </br>
-        blocks the <b>client#2</b> from writing to the same row.</i>
+        blocks the <b>client#2</b> from writing to the same row.</i>        
       </td>
-    </tr>
-    <tr>
-      <td>6</td>
-      <td></td>
-      <td></td>
     </tr>
     <tr>
       <td>7</td>
@@ -122,13 +131,11 @@ COMMIT
       <td></td>
       <td>
         <pre>
-psql> UPDATE weather SET temperature=0    
-      WHERE the_date='2020-04-15';
-<br>
+...
 UPDATE 1
         </pre>
-        <i>After the <b>client#1</b> transaction is committed,  
-    the lock is released. <b>client#2</b> transaction can acquire the lock.</i>
+        <i>Once the <b>client#1</b> transaction is committed,  
+    the lock is released. The <b>client#2</b> acquires the lock and completes the update.</i>
       </td>
     </tr>
     <tr>
@@ -141,7 +148,7 @@ psql> SELECT * FROM weather;
  id |  the_date  | temperature
 ----+------------+-------------
   2 | 2020-04-16 |           5
-  3 | 2020-04-17 |          10
+  3 | 2020-04-17 |          22
   1 | 2020-04-15 |           0
         </pre>
       </td>
