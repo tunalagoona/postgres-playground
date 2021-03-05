@@ -1,9 +1,9 @@
 
-## PostgreSQL Single Locks
+## Row-Level Locks
 
 [Reference](https://www.postgresql.org/docs/9.1/explicit-locking.html)
 
-### Database structure:
+### Database Structure
 
 ```
 psql> CREATE TABLE weather (  
@@ -67,7 +67,7 @@ psql> UPDATE weather SET temperature=11
 
 UPDATE 1
         </pre>
-    <i>An exclusive row-level lock on the row </br>
+    <i>An exclusive row-level lock for the row </br>
         is automatically acquired by the **client#1** when the row is updated.</i>
       </td>
       <td></td>
@@ -84,8 +84,8 @@ psql> SELECT * FROM weather
 ----+------------+-------------
   1 | 2020-04-15 |           8
     </pre>
-        <i>Row-level lock, acquired by the <b>client#1</b>, </br>
-          doesn't affect data querying by the <b>client#2</b>.</i>
+        <i>The row-level lock acquired by the <b>client#1</b> </br>
+          does not affect the select statement issued by the <b>client#2</b>.</i>
       </td>
     </tr>
     <tr>
@@ -98,8 +98,8 @@ psql> UPDATE weather SET temperature=0
 
   ...
         </pre>
-        <i>Row-level lock, acquired by the <b>client#1</b>,</br>
-        blocks the <b>client#2</b> writing to the same row.</i>
+        <i>However, the row-level lock acquired by the <b>client#1</b> </br>
+        blocks the <b>client#2</b> from writing to the same row.</i>
       </td>
     </tr>
     <tr>
