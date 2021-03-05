@@ -115,8 +115,9 @@ psql> UPDATE weather SET temperature=0
       WHERE the_date='2020-04-15';<br>   
 ...
         </pre>
-        <i>However, the row-level lock acquired by <b>Client#1</b> </br>
-        blocks <b>Client#2</b> from writing to the same row.</i>        
+        <i>However, the row-level lock acquired</br>
+        by <b>Client#1</b> blocks <b>Client#2</b> </br>
+        from writing to the same row.</i>        
       </td>
     </tr>
     <tr>
