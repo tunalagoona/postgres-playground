@@ -30,8 +30,8 @@ psql> INSERT INTO kids (name, age) VALUES ('Sam', 5);
 <table>
   <thead>
     <th>#</th>
-    <th>client#1</th>
-    <th>client#2</th>
+    <th>Client#1</th>
+    <th>Client#2</th>
   </thead>
   <tbody>
   <tr>
@@ -75,7 +75,7 @@ psql> SELECT * FROM kids;
   3 | Sam  |   5
 </p>
     </pre>
-    <i>The SELECT query can not see the uncommitted changes made by the <b>client#2</b>.</i>
+    <i>The SELECT query can not see the uncommitted changes made by <b>Client#2</b>.</i>
     </td>
     <td></td>
   </tr>
@@ -103,7 +103,7 @@ psql> SELECT * FROM kids;
   3 | Sam  |   5
 </p>
     </pre>
-    <i>Once the changes are committed by the <b>client#2</b>, they become visible to the <b>client#1</b> transaction.</i>
+    <i>Once the changes are committed by <b>Client#2</b>, they become visible to <b>Client#1</b>.</i>
     </td>
     <td></td>
   </tr>
@@ -117,8 +117,8 @@ psql> SELECT * FROM kids;
 <table>
   <thead>
     <th>#</th>
-    <th>client#1</th>
-    <th>client#2</th>
+    <th>Client#1</th>
+    <th>Client#2</th>
   </thead>
   <tbody>
   <tr>
@@ -180,7 +180,7 @@ psql> SELECT * FROM kids;
   3 | Sam  |   5
 </p>
     </pre>
-      <i>While the <b>client#2</b> has already committed the changes, <b>client#1</b> uses the snapshot created at the step 2 which does not include those changes.</i>
+      <i>While <b>Client#2</b> has already committed the changes, <b>Client#1</b> uses the snapshot created at the step 2 which does not include those changes.</i>
     </td>
     <td></td>
   </tr>
