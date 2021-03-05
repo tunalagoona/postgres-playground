@@ -335,7 +335,7 @@ psql> UPDATE weather SET temperature=0
   ...
         </pre>
         <i>The <b>client#2</b> has to wait to acquire </br>
-          an exclusive row-level lock on the row (implicit or explicit).</i>
+          an exclusive (implicit or explicit) row-level lock on the row.</i>
       </td>
     </tr>
     <tr>
