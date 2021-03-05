@@ -1,7 +1,7 @@
 
 ## Deadlocks
 
-[Reference](https://www.postgresql.org/docs/9.1/explicit-locking.html)
+[Postgres Reference](https://www.postgresql.org/docs/9.1/explicit-locking.html)
 
 ### Database Structure
 
